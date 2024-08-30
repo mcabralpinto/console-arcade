@@ -1,0 +1,129 @@
+{
+    "MENUS": {
+        "MAIN": [
+            "\u2554\u2550\u2557\u2566\u2550\u2557\u2554\u2550\u2557\u2554\u2550\u2557\u2554\u2566\u2557\u2554\u2550\u2557",
+            "\u2560\u2550\u2563\u2560\u2566\u255d\u2551  \u2560\u2550\u2563 \u2551\u2551\u2551\u2563",
+            "\u2569 \u2569\u2569\u255a\u2550\u255a\u2550\u255d\u2569 \u2569\u2550\u2569\u255d\u255a\u2550\u255d"
+        ],
+        "ABALONE": [
+            "\u2554\u2550\u2557\u2554\u2557 \u2554\u2550\u2557\u2566  \u2554\u2550\u2557\u2554\u2557\u2554\u2554\u2550\u2557",
+            "\u2560\u2550\u2563\u2560\u2569\u2557\u2560\u2550\u2563\u2551  \u2551 \u2551\u2551\u2551\u2551\u2551\u2563",
+            "\u2569 \u2569\u255a\u2550\u255d\u2569 \u2569\u2569\u2550\u255d\u255a\u2550\u255d\u255d\u255a\u255d\u255a\u2550\u255d"
+        ],
+        "REPLAYS": [
+            "\u2566\u2550\u2557\u2554\u2550\u2557\u2554\u2550\u2557\u2566  \u2554\u2550\u2557\u2566 \u2566\u2554\u2550\u2557",
+            "\u2560\u2566\u255d\u2551\u2563 \u2560\u2550\u255d\u2551  \u2560\u2550\u2563\u255a\u2566\u255d\u255a\u2550\u2557",
+            "\u2569\u255a\u2550\u255a\u2550\u255d\u2569  \u2569\u2550\u255d\u2569 \u2569 \u2569 \u255a\u2550\u255d"
+        ]
+    },
+    "OPTS": {
+        "MAIN": [
+            "Abalone",
+            "2048 (WIP)",
+            "Snake (WIP)",
+            "Tetris (WIP)",
+            "Exit"
+        ],
+        "GAME": [
+            "Play Game",
+            "Replays",
+            "Return"
+        ],
+        "RE_GAME": [
+            "Play Again",
+            "Save Replay",
+            "Replays",
+            "Return"
+        ],
+        "RE_ABALONE": [
+            "\u001b[31m0\u001b[0m - \u001b[34m1\u001b[0m \u00b7 16:30 \u00b7 30-08-2024",
+            "\u001b[31m0\u001b[0m - \u001b[34m1\u001b[0m \u00b7 15:05 \u00b7 19-08-2024",
+            "\u001b[31m0\u001b[0m - \u001b[34m1\u001b[0m \u00b7 15:03 \u00b7 19-08-2024",
+            "\u001b[31m0\u001b[0m - \u001b[34m1\u001b[0m \u00b7 15:03 \u00b7 19-08-2024",
+            "Return"
+        ]
+    },
+    "REPLAYS": {
+        "ABALONE": [
+            [
+                "down",
+                "down",
+                "space",
+                "right",
+                "down",
+                "down",
+                "right",
+                "space",
+                "up",
+                "up",
+                "space",
+                "down",
+                "down",
+                "space"
+            ],
+            [
+                "down",
+                "down",
+                "up",
+                "up",
+                "up",
+                "up",
+                "space",
+                "left",
+                "up",
+                "left",
+                "up",
+                "space",
+                "down",
+                "down",
+                "space",
+                "up",
+                "up",
+                "space"
+            ],
+            [
+                "down",
+                "down",
+                "space",
+                "right",
+                "down",
+                "down",
+                "right",
+                "space",
+                "up",
+                "up",
+                "space",
+                "down",
+                "down",
+                "space"
+            ],
+            [
+                "down",
+                "down",
+                "space",
+                "down",
+                "right",
+                "right",
+                "down",
+                "space",
+                "up",
+                "up",
+                "space",
+                "down",
+                "down",
+                "space"
+            ]
+        ]
+    },
+    "COLORS": {
+        "BLACK": "\u001b[30m",
+        "RED": "\u001b[31m",
+        "GREEN": "\u001b[32m",
+        "YELLOW": "\u001b[33m",
+        "BLUE": "\u001b[34m",
+        "MAGENTA": "\u001b[35m",
+        "CYAN": "\u001b[36m",
+        "WHITE": "\u001b[37m",
+        "RESET": "\u001b[0m"
+    }
+}
