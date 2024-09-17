@@ -6,7 +6,7 @@ Console Arcade is a Python-based project I've been working that includes an ever
 
 1. **Clone the repository:**
     ```sh
-    git clone <repository-url>
+    git clone [<repository-url>](https://github.com/mcabralpinto/console-arcade.git)
     cd console-arcade
     ```
 
