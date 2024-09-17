@@ -1,20 +1,19 @@
 from drawable import Drawable
 from dataclasses import dataclass, field
-from typing import Any, List, Dict
+from typing import Any
 
 @dataclass
 class Board(Drawable):
-    screen_dim: tuple[int, int]
-    board: List[List[str]] = field(default_factory=list)
-    cursor: List[int] = field(default_factory=list)
-    scores: Dict[str, int] = field(default_factory=dict)
+    board: list[list[str]] = field(default_factory=list)
+    cursor: list[int] = field(default_factory=list)
+    scores: dict[str, int] = field(default_factory=dict)
     turn: bool = field(default_factory=bool)
 
-    def update(self, values: List[Any]) -> None:
+    def update(self, values: list[Any]) -> None:
         self.board, self.cursor, self.scores, self.turn = values
 
     # draws the abalone board
-    def content(self, values: List[Any]) -> None:
+    def content(self, values: list[Any]) -> None:
         self.update(values)
         b, c, s = self.board, self.cursor, self.scores
         W = self.dim[0]

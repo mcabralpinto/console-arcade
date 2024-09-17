@@ -1,49 +1,46 @@
-from status import Status
-from drawable_abalone import Board
+from structs import Status
+from abalone_drawable import Board
 
+from dataclasses import dataclass, field
 from copy import copy, deepcopy
-from pynput.keyboard import Key
-from typing import Dict, List, Tuple, Any
-from pynput.keyboard import KeyCode
+from pynput.keyboard import Key, KeyCode
+from typing import Any
 import time
 
 
 class Abalone:
-    def __init__(self, arcade, w: int, h: int):
-        self.arcade: Any = arcade  # arcade object
-        self.start()
-
-        self.display: Board = Board(dim=(22, 13), screen_dim=(w, h))
+    def __init__(self, arcade: Any):
+        self.arcade: Any = arcade  # arcade instance
 
         self.WIDTH: int = 22
         self.HEIGHT: int = 13  # game dimensions
-        self.SCREEN_WIDTH: int = w
-        self.SCREEN_HEIGHT: int = h  # screen dimensions
-        self.KEYS: Tuple[KeyCode, KeyCode, KeyCode, KeyCode] = (
+        self.MOVE: tuple[KeyCode, KeyCode, KeyCode, KeyCode] = (
             Key.up,
             Key.down,
             Key.left,
             Key.right,
         )  # movement keys
-        self.BOARD_POS: List[List[Tuple[int, int]]] = [
+        self.BOARD_POS: list[list[tuple[int, int]]] = [
             [(i, abs(4 - i) + 2 * j) for j in range(9 - abs(4 - i))] for i in range(9)
-        ]  # array with "true" board coordinates, helps with several operations
+        ]  # array with "true" board position coordinates, helps with several operations
+
+        self.display: Board = Board(dim=(self.WIDTH, self.HEIGHT)) # board display
 
     def start(self, dispo: str = "") -> None:
-        self.board: List[List[str]] = [
+        self.board: list[list[str]] = [
             ["·" for _ in range(9 - abs(4 - i))] for i in range(9)
         ]
-        self.cursor: List[int] = [4, 4]  # cursor position
-        self.play_start: List[int] = []  # coors of the starting position of a play
-        self.idx_vector: List[List[int]] = []  # indexes of all pieces moved in a play
+        self.cursor: list[int] = [4, 4]  # cursor position
+        self.play_start: list[int] = []  # coors of the starting position of a play
+        self.idx_vector: list[list[int]] = []  # indexes of all pieces moved in a play
         self.turn: bool = True  # True if it's the red player's turn, False otherwise
-        self.scores: Dict[str, int] = {"R": 0, "B": 0}  # scores of both players
+        self.scores: dict[str, int] = {"R": 0, "B": 0}  # scores of both players
         if dispo != "":
             self.fill_board(dispo)
 
     def get_indexes(
-        self, board_pos: List[List[Tuple[int, int]]], coors: Tuple[int, ...]
-    ) -> List[int]:
+        self, board_pos: list[list[tuple[int, int]]], coors: tuple[int, ...]
+    ) -> list[int]:
         for row_idx, row in enumerate(board_pos):
             for col_idx, element in enumerate(row):
                 if element == coors:
@@ -250,12 +247,12 @@ class Abalone:
             RC, BC = self.display.paint("▣", "RED"), self.display.paint("▣", "BLUE")
 
             if (
-                key in list(self.KEYS) + [Key.space]
+                key in list(self.MOVE) + [Key.space]
                 and self.arcade.status != Status.IN_REPLAY
             ):
-                self.arcade.replay_vector.append(key)
+                self.arcade.game_info.keys.append(key)
 
-            if key in self.KEYS:
+            if key in self.MOVE:
                 if p != [c[0], c[1]]:
                     b[c[0]][c[1]] = {"◘": "·", RC: R, BC: B}[b[c[0]][c[1]]]
                 shift = (
@@ -270,7 +267,7 @@ class Abalone:
                         ),
                         1,
                     ),
-                )[self.KEYS.index(key)]
+                )[self.MOVE.index(key)]
                 c[0] = min(8, max(0, c[0] + shift[0]))
                 c[1] = min(len(b[c[0]]) - 1, max(0, c[1] + shift[1]))
                 self.display.draw([self.board, self.cursor, self.scores, self.turn])
@@ -310,11 +307,12 @@ class Abalone:
                             self.play_start = []
                             self.turn = not self.turn
                         self.idx_vector = []
-                if self.scores["B" if self.turn else "R"] < 1:
+                if self.scores["B" if self.turn else "R"] < 6:
                     self.display.draw([self.board, self.cursor, self.scores, self.turn])
                 else:
                     self.arcade.transition.draw()
                     if self.arcade.status != Status.IN_REPLAY:
+                        self.arcade.game_info.score = self.scores
                         self.arcade.status = Status.POST_GAME
                     else:
                         self.arcade.status = Status.PRE_GAME
@@ -329,12 +327,12 @@ class Abalone:
             pass
 
     def run_replay(self):
-        for key in self.arcade.replay_vector:
+        for key in self.arcade.game_info.keys:
             time.sleep(0.5)
             if self.arcade.status != Status.IN_REPLAY:
                 break
             self.on_press(key)
-        self.arcade.replay_vector = []
+        self.arcade.game_info.clear()
         self.arcade.status = Status.PRE_GAME
 
     def run(self):

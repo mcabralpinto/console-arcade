@@ -1,7 +1,6 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Any, Dict, List
-from status import Status
+from typing import Any
 import json
 import os
 
@@ -11,7 +10,7 @@ class Drawable(ABC):
     dim: tuple[int, int]
 
     # loads data from the data.json file
-    def load_data(self) -> Dict[str, Any]:
+    def load_data(self) -> dict[str, Any]:
         with open("..\\data\\data.json", "r", encoding="utf-8") as file:
             return json.load(file)
 
@@ -36,7 +35,7 @@ class Drawable(ABC):
     def content(self, values) -> None: ...
 
     # buffer
-    def draw(self, values: List[Any] = []) -> None:
+    def draw(self, values: list[Any] = []) -> None:
         self.start_pos()
         self.data = self.load_data()
         self.content(values)

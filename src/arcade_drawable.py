@@ -1,11 +1,12 @@
 from drawable import Drawable
-from status import Status
+from structs import Status
 from dataclasses import dataclass, field
-from typing import Any, List
+from typing import Any
 from datetime import datetime
 import re
 import time
 import os
+
 
 @dataclass
 class Border(Drawable):
@@ -27,6 +28,7 @@ class Border(Drawable):
             + f"{self.move(-W - 1, -H - 4)}",
             end="",
         )
+
 
 @dataclass
 class Transition(Drawable):
@@ -68,28 +70,28 @@ class Transition(Drawable):
         self.start_pos()
         self.half(" ")
 
+
 @dataclass
 class Menu(Drawable):
-    title: str = ""
+    title: str = field(default_factory=str)
     option: int = field(default_factory=int)
     game: int = field(default_factory=int)
     curr: Any = None
     status: Status = Status.PRE_GAME
-    
 
-    def update(self, values: List[Any]) -> None:
+    def update(self, values: list[Any]) -> None:
         self.title, self.option, self.game, self.curr, self.status = values
 
     # returns the length of a string without ANSI escape sequences
     def pure_len(self, text: str) -> int:
         ansi_escape = re.compile(r"\x1B[@-_][0-?]*[ -/]*[@-~]")
         return len(ansi_escape.sub("", text))
-    
+
     # returns the string representation of the current game in the replay menu
     def replay_str(self, info: Any) -> str:
         date = datetime.now().strftime("%d-%m-%Y")
         hour = datetime.now().strftime("%H:%M")
-        if self.game == 1: # Abalone
+        if self.game == 1:  # Abalone
             return (
                 self.paint(info["R"], "RED")
                 + " - "
@@ -126,6 +128,9 @@ class Menu(Drawable):
             RED = self.paint(self.curr.scores["R"], "RED")
             BLUE = self.paint(self.curr.scores["B"], "BLUE")
             return f"{D}{R * ((W - 5) // 2)}{RED} - {BLUE}{R * ((W - 4) // 2)}{N}"
+        elif self.game == 2:
+            L = len(str(self.curr.score))
+            return f"{D}{R * ((W - L) // 2)}{self.curr.score}{R * ((W - L + 1) // 2)}{N}"
         return ""
 
     # returns the option string for the current menu
@@ -170,7 +175,7 @@ class Menu(Drawable):
         return final
 
     # draws the current menu state
-    def content(self, values: List[Any]) -> None:
+    def content(self, values: list[Any]) -> None:
         self.update(values)
         W, H = self.dim[0], self.dim[1]
         R, N = "\033[C", self.move(-W, 1)
