@@ -98,6 +98,8 @@ class Menu(Drawable):
                 + self.paint(info["B"], "BLUE")
                 + f" · {hour} · {date}"
             )
+        elif self.game == 2:  # 2048
+            return f"{info} · {hour} · {date}"
         return ""
 
     # returns the title of the current menu
@@ -129,8 +131,8 @@ class Menu(Drawable):
             BLUE = self.paint(self.curr.scores["B"], "BLUE")
             return f"{D}{R * ((W - 5) // 2)}{RED} - {BLUE}{R * ((W - 4) // 2)}{N}"
         elif self.game == 2:
-            L = len(str(self.curr.score))
-            return f"{D}{R * ((W - L) // 2)}{self.curr.score}{R * ((W - L + 1) // 2)}{N}"
+            L = len(str(score := self.curr.score))
+            return f"{D}{R * ((W - L) // 2)}{score}{R * ((W - L + 1) // 2)}{N}"
         return ""
 
     # returns the option string for the current menu

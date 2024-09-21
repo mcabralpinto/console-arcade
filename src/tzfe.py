@@ -5,7 +5,7 @@ import time
 from copy import deepcopy
 from pynput.keyboard import Key, KeyCode
 from random import random, randint
-from typing import Any
+from typing import Any, Optional
 
 
 class TZFE:
@@ -24,6 +24,8 @@ class TZFE:
         self.score: int = 0  # game score
         self.board: list[list[str]] = [[""] * self.SIZE for _ in range(self.SIZE)]
         self.free_cells: int = self.SIZE * self.SIZE  # number of free cells
+        if (self.arcade.status != Status.IN_REPLAY): 
+            self.arcade.game_info.data["CELLS"] = []
 
     def can_merge(self) -> bool:
         for key in self.MOVE:
@@ -31,18 +33,25 @@ class TZFE:
                 return True
         return False
 
-    def fill_board(self, n: int) -> bool:
+    def fill_board(
+        self, n: int, cells: list[tuple[int, int, str]] = []
+    ) -> tuple[list[tuple[int, int, str]], bool]:
         self.free_cells -= n
+        i: int
+        j: int
+        cells_re: list[tuple[int, int, str]] = []
         for _ in range(n):
-            i: int
-            j: int
-            i, j = randint(0, self.SIZE - 1), randint(0, self.SIZE - 1)
-            while self.board[i][j] != "":
+            if cells != []:
+                i, j, self.board[i][j] = cells.pop()
+            else:
                 i, j = randint(0, self.SIZE - 1), randint(0, self.SIZE - 1)
-            self.board[i][j] = "2" if random() > 0.1 else "4"
+                while self.board[i][j] != "":
+                    i, j = randint(0, self.SIZE - 1), randint(0, self.SIZE - 1)
+                self.board[i][j] = "2" if random() > 0.1 else "4"
+                cells_re.append((i, j, self.board[i][j]))
             if self.free_cells == 0 and not self.can_merge():
-                return False
-        return True
+                return cells_re, False
+        return cells_re, True
 
     def make_moves(
         self, b: list[list[str]], key: KeyCode, can_merge_test: bool = False
@@ -101,19 +110,30 @@ class TZFE:
         )
         return b
 
-    def on_press(self, key: KeyCode) -> None:
+    def on_press(self, key: KeyCode, info: list[Any] = []) -> None:
+        c: Optional[tuple[int, int, str]] = info[0] if info != [] else None
         try:
             if key in self.MOVE:
                 aux_board: list[list[str]] = self.make_moves(deepcopy(self.board), key)
                 if aux_board != self.board:
                     self.board = deepcopy(aux_board)
+
                     for i in range(5 if key in self.MOVE[0:1] else 4):
+                        if c != None and self.arcade.status != Status.IN_REPLAY:
+                            break
                         self.display.draw([self.board, self.score, self.moves, i + 1])
                         time.sleep(0.015)
-                    proceed = self.fill_board(1)
-                    self.display.draw([self.board, self.score, self.moves, 0])
+                    r: bool = self.arcade.status == Status.IN_REPLAY
+                    cells, proceed = self.fill_board(1, [c] if r and c != None else [])
+                    if r:
+                        self.arcade.game_info.keys.append(key)
+                        self.arcade.game_info.data["CELLS"] += cells
+                    if c == None or r:
+                        self.display.draw([self.board, self.score, self.moves, 0])
                     if not proceed:
                         time.sleep(1)
+                        self.arcade.game_info.score = self.score
+                        self.arcade.game_info.data["CELLS"].reverse()
                         self.arcade.transition.draw()
                         self.arcade.status = Status.POST_GAME
                         self.arcade.on_press(Key.up)
@@ -124,7 +144,25 @@ class TZFE:
         except AttributeError:
             pass
 
-    def run(self):
-        self.start()
-        self.fill_board(2)
+    def run_replay(self):
+        self.board = [[""] * self.SIZE for _ in range(self.SIZE)]
+        cells = deepcopy(self.arcade.game_info.data["CELLS"])
+        self.fill_board(2, [cells.pop() for _ in range(2)])
         self.display.draw([self.board, self.score, self.moves, 0])
+        for key in self.arcade.game_info.keys:
+            time.sleep(0.2)
+            if self.arcade.status != Status.IN_REPLAY:
+                break
+            self.on_press(key, [cells.pop()])
+        self.arcade.game_info.clear()
+        self.arcade.status = Status.PRE_GAME
+
+    def run(self):
+        try:
+            self.start()
+            if self.arcade.status != Status.IN_REPLAY:
+                cells, _ = self.fill_board(2, [])
+                self.arcade.game_info.data["CELLS"] += cells
+                self.display.draw([self.board, self.score, self.moves, 0])
+        except KeyboardInterrupt:
+            pass

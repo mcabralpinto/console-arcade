@@ -240,7 +240,7 @@ class Abalone:
             return 3
         return -1
 
-    def on_press(self, key: KeyCode) -> None:
+    def on_press(self, key: KeyCode, info: list[Any] = []) -> None:
         try:
             b, c, p = self.board, self.cursor, self.play_start
             R, B = self.display.paint("■", "RED"), self.display.paint("■", "BLUE")

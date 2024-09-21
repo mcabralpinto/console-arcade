@@ -5,6 +5,7 @@ from tzfe import TZFE
 from structs import Status
 from game_info import GameInfo
 
+import os
 import json
 import threading
 from typing import Any
@@ -34,7 +35,8 @@ class Arcade:
 
     # loads data from the data.json file
     def load_data(self) -> dict[str, Any]:
-        with open("..\\data\\data.json", "r", encoding="utf-8") as file:
+        data_path = os.path.join("..", "data", "data.json")
+        with open(data_path, "r", encoding="utf-8") as file:
             return json.load(file)
 
     # handles key presses
