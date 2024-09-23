@@ -1,2 +1,6 @@
 env
-src/__pycache__
+
+# Python temp files
+__pycache__/
+*.py[cod]
+*$py.class
