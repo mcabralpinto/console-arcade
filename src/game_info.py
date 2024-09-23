@@ -2,6 +2,7 @@ from dataclasses import dataclass, field
 from typing import Any, Union
 from pynput.keyboard import Key, KeyCode
 
+
 @dataclass
 class GameInfo:
     keys: list[KeyCode] = field(default_factory=list)
@@ -27,14 +28,11 @@ class GameInfo:
     # converts a key array's elements from pynput.keyboard.Key to string
     def key_to_str(self, keys: list[KeyCode]) -> list[str]:
         return [str(key).replace("Key.", "") for key in keys]
-    
+
     # converts the GameInfo object to a dictionary with string values
     def data_to_str(self) -> dict[str, Any]:
-        return {
-            "KEYS": self.key_to_str(self.keys),
-            "DATA": self.data
-        }
-    
+        return {"KEYS": self.key_to_str(self.keys), "DATA": self.data}
+
     # converts a dictionary with string values to a GameInfo object
     def str_to_data(self, data: dict[str, Any]) -> None:
         self.keys = self.str_to_key(data["KEYS"])

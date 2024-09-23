@@ -9,29 +9,31 @@ import os
 import json
 import threading
 from typing import Any
+from dataclasses import dataclass, field
 from pynput.keyboard import Key, KeyCode, Listener
 
 # U, D, R, L = "\033[A", "\033[B", "\033[C", "\033[D"
 
 
+@dataclass
 class Arcade:
-    def __init__(self, w: int, h: int) -> None:
+    # data: dict[str, Any] = None  # data.json content
+    title: str = "MAIN"  # current menu title
+    opt: int = 0  # option number. indexes the self.data.OPTS tuple
+    game: int = 0  # game id. indexes the self.data.GAMES tuple
+    curr: Any = None  # current game instance
+    status: Status = Status.PRE_GAME  # current status
+    game_info: GameInfo = field(default_factory=GameInfo)  # stores info for replays
+
+    GAMES: list[Any] = field(default_factory=lambda: [Abalone, TZFE])  # game classes
+
+    border: Border = field(default_factory=lambda: Border(dim=(36, 21)))
+    transition: Transition = field(default_factory=lambda: Transition(dim=(36, 21)))
+    menu: Menu = field(default_factory=lambda: Menu(dim=(36, 21)))
+
+    def __post_init__(self):
         self.listener = Listener(on_press=self.on_press)  # key input listener
         self.data: dict[str, Any] = self.load_data()  # data.json content
-        self.title: str = "MAIN"  # current menu title
-        self.opt: int = 0  # option number. indexes the self.data.OPTS tuple
-        self.game: int = 0  # game id. indexes the self.data.GAMES tuple
-        self.curr: Any = None  # current game instance
-        self.status: Status = Status.PRE_GAME  # current status
-        self.game_info: GameInfo = GameInfo()  # stores info related to the current game
-
-        self.WIDTH: int = w
-        self.HEIGHT: int = h  # border dimensions
-        self.GAMES: list[Any] = [Abalone, TZFE]  # game classes
-
-        self.border: Border = Border(dim=(w, h))
-        self.transition: Transition = Transition(dim=(w, h))
-        self.menu: Menu = Menu(dim=(w, h))
 
     # loads data from the data.json file
     def load_data(self) -> dict[str, Any]:
@@ -75,7 +77,7 @@ class Arcade:
                             self.transition.draw()
                             self.game = self.opt + 1
                             self.title = list(self.data["MENUS"])[self.game + 1]
-                            self.curr = self.GAMES[self.game - 1](self)
+                            self.curr = self.GAMES[self.game - 1](arcade=self)
                             self.opt = 0
                         elif opt_text == "Exit":
                             self.listener.stop()

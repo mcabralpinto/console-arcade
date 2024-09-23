@@ -9,7 +9,7 @@ class CONSOLE_CURSOR_INFO(ctypes.Structure):
 
 
 def hide_cursor():
-    if os.name == 'nt':  # Windows
+    if os.name == "nt":  # Windows
         SetConsoleCursorInfo = ctypes.windll.kernel32.SetConsoleCursorInfo
         GetStdHandle = ctypes.windll.kernel32.GetStdHandle
         STD_OUTPUT_HANDLE = -11
@@ -25,8 +25,9 @@ def hide_cursor():
         sys.stdout.write("\033[?25l")
         sys.stdout.flush()
 
+
 def show_cursor():
-    if os.name == 'nt':  # Windows
+    if os.name == "nt":  # Windows
         SetConsoleCursorInfo = ctypes.windll.kernel32.SetConsoleCursorInfo
         GetStdHandle = ctypes.windll.kernel32.GetStdHandle
         STD_OUTPUT_HANDLE = -11
@@ -42,17 +43,18 @@ def show_cursor():
         sys.stdout.write("\033[?25h")
         sys.stdout.flush()
 
+
 def clear_console():
-    if os.name == 'nt':
-        os.system('cls')
-    else:
-        os.system('clear')
+    if os.name == "nt":  # Windows
+        os.system("cls")
+    else:  # Unix-like (Linux, macOS)
+        os.system("clear")
+
 
 def main():
-    W, H = 36, 21
     hide_cursor()
     clear_console()
-    arcade = Arcade(W, H)
+    arcade = Arcade()
     arcade.run()
     show_cursor()
 

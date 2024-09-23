@@ -1,32 +1,27 @@
+from game import Game
 from structs import Status
 from abalone_drawable import Board
 
+import time
 from dataclasses import dataclass, field
-from copy import copy, deepcopy
 from pynput.keyboard import Key, KeyCode
 from typing import Any
-import time
+from copy import copy, deepcopy
 
 
-class Abalone:
-    def __init__(self, arcade: Any):
-        self.arcade: Any = arcade  # arcade instance
-
-        self.WIDTH: int = 22
-        self.HEIGHT: int = 13  # game dimensions
-        self.MOVE: tuple[KeyCode, KeyCode, KeyCode, KeyCode] = (
-            Key.up,
-            Key.down,
-            Key.left,
-            Key.right,
-        )  # movement keys
-        self.BOARD_POS: list[list[tuple[int, int]]] = [
+@dataclass
+class Abalone(Game):
+    BOARD_POS: list[list[tuple[int, int]]] = field(
+        default_factory=lambda: [
             [(i, abs(4 - i) + 2 * j) for j in range(9 - abs(4 - i))] for i in range(9)
-        ]  # array with "true" board position coordinates, helps with several operations
+        ]
+    )  # array with "true" board position coordinates, helps with several operations
 
-        self.display: Board = Board(dim=(self.WIDTH, self.HEIGHT)) # board display
+    def __post_init__(self):
+        self.display: Board = Board(dim=(22, 13))
+        self.KEYS = {"MOVE": [Key.up, Key.down, Key.left, Key.right]}  # key mapping
 
-    def start(self, dispo: str = "") -> None:
+    def start(self, info: str = "") -> None:
         self.board: list[list[str]] = [
             ["·" for _ in range(9 - abs(4 - i))] for i in range(9)
         ]
@@ -35,8 +30,8 @@ class Abalone:
         self.idx_vector: list[list[int]] = []  # indexes of all pieces moved in a play
         self.turn: bool = True  # True if it's the red player's turn, False otherwise
         self.scores: dict[str, int] = {"R": 0, "B": 0}  # scores of both players
-        if dispo != "":
-            self.fill_board(dispo)
+        if info != "":
+            self.fill_board(info)
 
     def get_indexes(
         self, board_pos: list[list[tuple[int, int]]], coors: tuple[int, ...]
@@ -247,12 +242,12 @@ class Abalone:
             RC, BC = self.display.paint("▣", "RED"), self.display.paint("▣", "BLUE")
 
             if (
-                key in list(self.MOVE) + [Key.space]
+                key in list(self.KEYS["MOVE"]) + [Key.space]
                 and self.arcade.status != Status.IN_REPLAY
             ):
                 self.arcade.game_info.keys.append(key)
 
-            if key in self.MOVE:
+            if key in self.KEYS["MOVE"]:
                 if p != [c[0], c[1]]:
                     b[c[0]][c[1]] = {"◘": "·", RC: R, BC: B}[b[c[0]][c[1]]]
                 shift = (
@@ -267,7 +262,7 @@ class Abalone:
                         ),
                         1,
                     ),
-                )[self.MOVE.index(key)]
+                )[self.KEYS["MOVE"].index(key)]
                 c[0] = min(8, max(0, c[0] + shift[0]))
                 c[1] = min(len(b[c[0]]) - 1, max(0, c[1] + shift[1]))
                 self.display.draw([self.board, self.cursor, self.scores, self.turn])

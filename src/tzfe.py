@@ -1,34 +1,33 @@
+from game import Game
 from tzfe_drawable import Board
 from structs import Move2048 as Move, Status
 
 import time
-from copy import deepcopy
+from dataclasses import dataclass, field
 from pynput.keyboard import Key, KeyCode
-from random import random, randint
 from typing import Any, Optional
+from copy import deepcopy
+from random import random, randint
 
 
-class TZFE:
-    def __init__(self, arcade: Any) -> None:
-        self.arcade: Any = arcade  # arcade instance
-        self.SIZE: int = 4  # board size
-        self.MOVE: list[KeyCode] = [Key.up, Key.down, Key.left, Key.right]  # move keys
+@dataclass
+class TZFE(Game):
+    moves: dict[tuple[int, int], Move] = field(default_factory=dict)  # moving cell info
+    SIZE: int = 4  # board size
 
-        self.moves: dict[tuple[int, int], Move] = {}  # dict with every moving cell
-
-        self.display = Board(
-            dim=(self.SIZE * 5 + 1, self.SIZE * 2 + 3)
-        )  # board display
+    def __post_init__(self):
+        self.display: Board = Board(dim=(self.SIZE * 5 + 1, self.SIZE * 2 + 3))
+        self.KEYS = {"MOVE": [Key.up, Key.down, Key.left, Key.right]}  # key mapping
 
     def start(self) -> None:
         self.score: int = 0  # game score
         self.board: list[list[str]] = [[""] * self.SIZE for _ in range(self.SIZE)]
         self.free_cells: int = self.SIZE * self.SIZE  # number of free cells
-        if (self.arcade.status != Status.IN_REPLAY): 
+        if self.arcade.status != Status.IN_REPLAY:
             self.arcade.game_info.data["CELLS"] = []
 
     def can_merge(self) -> bool:
-        for key in self.MOVE:
+        for key in self.KEYS["MOVE"]:
             if self.make_moves(deepcopy(self.board), key, True) != self.board:
                 return True
         return False
@@ -57,7 +56,7 @@ class TZFE:
         self, b: list[list[str]], key: KeyCode, can_merge_test: bool = False
     ) -> list[list[str]]:
         shift: tuple[int, int] = ((-1, 0), (1, 0), (0, -1), (0, 1))[
-            self.MOVE.index(key)
+            self.KEYS["MOVE"].index(key)
         ]
         mergeable: list[list[bool]] = [[True] * self.SIZE for _ in range(self.SIZE)]
         for i in range(self.SIZE):
@@ -113,12 +112,12 @@ class TZFE:
     def on_press(self, key: KeyCode, info: list[Any] = []) -> None:
         c: Optional[tuple[int, int, str]] = info[0] if info != [] else None
         try:
-            if key in self.MOVE:
+            if key in self.KEYS["MOVE"]:
                 aux_board: list[list[str]] = self.make_moves(deepcopy(self.board), key)
                 if aux_board != self.board:
                     self.board = deepcopy(aux_board)
 
-                    for i in range(5 if key in self.MOVE[0:1] else 4):
+                    for i in range(5 if key in self.KEYS["MOVE"][0:1] else 4):
                         if c != None and self.arcade.status != Status.IN_REPLAY:
                             break
                         self.display.draw([self.board, self.score, self.moves, i + 1])

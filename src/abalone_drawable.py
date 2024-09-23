@@ -2,6 +2,7 @@ from drawable import Drawable
 from dataclasses import dataclass, field
 from typing import Any
 
+
 @dataclass
 class Board(Drawable):
     board: list[list[str]] = field(default_factory=list)

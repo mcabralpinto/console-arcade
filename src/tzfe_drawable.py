@@ -65,10 +65,8 @@ class Board(Drawable):
                 )
                 + DATA["TR"][board_str[row_idx][col_idx + 5]],
                 DATA["CL"][board_str[row_idx + 1][col_idx]]
-                #"┃"
                 + f"{' ' * (4 - len(value))}{value}"
                 + DATA["CR"][board_str[row_idx + 1][col_idx + 5]],
-                #"┃",
                 DATA["BL"][board_str[row_idx + 2][col_idx]]
                 + "".join(
                     [
