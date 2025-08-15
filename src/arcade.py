@@ -1,5 +1,5 @@
 # cd git\console-arcade && .\env\Scripts\activate && cd src && python main.py
-from arcade_drawable import Border, Transition, Menu
+from drawables.arcade_drawable import Border, Transition, Menu
 from abalone import Abalone
 from tzfe import TZFE
 from structs import Status
@@ -17,7 +17,6 @@ from pynput.keyboard import Key, KeyCode, Listener
 
 @dataclass
 class Arcade:
-    # data: dict[str, Any] = None  # data.json content
     title: str = "MAIN"  # current menu title
     opt: int = 0  # option number. indexes the self.data.OPTS tuple
     game: int = 0  # game id. indexes the self.data.GAMES tuple
@@ -25,7 +24,8 @@ class Arcade:
     status: Status = Status.PRE_GAME  # current status
     game_info: GameInfo = field(default_factory=GameInfo)  # stores info for replays
 
-    GAMES: list[Any] = field(default_factory=lambda: [Abalone, TZFE])  # game classes
+    # game classes
+    GAMES: list[Any] = field(default_factory=lambda: [Abalone, TZFE])
 
     border: Border = field(default_factory=lambda: Border(dim=(36, 21)))
     transition: Transition = field(default_factory=lambda: Transition(dim=(36, 21)))
@@ -33,11 +33,11 @@ class Arcade:
 
     def __post_init__(self):
         self.listener = Listener(on_press=self.on_press)  # key input listener
-        self.data: dict[str, Any] = self.load_data()  # data.json content
+        self.data: dict[str, Any] = self.load_data("menu")  # menu.json content
 
-    # loads data from the data.json file
-    def load_data(self) -> dict[str, Any]:
-        data_path = os.path.join("..", "data", "data.json")
+    # loads data from the a json file
+    def load_data(self, dir: str) -> dict[str, Any]:
+        data_path = os.path.join("..", f"data\{dir}.json")
         with open(data_path, "r", encoding="utf-8") as file:
             return json.load(file)
 
@@ -96,25 +96,30 @@ class Arcade:
                             ) + game
                             replay_str = self.menu.replay_str(self.game_info.score)
 
-                            with open(
-                                "..\\data\\data.json", "r+", encoding="utf-8"
-                            ) as file:
-                                data = json.load(file)
-                                data["REPLAYS"][game].reverse()
-                                data["REPLAYS"][game].append(stored_info)
-                                data["REPLAYS"][game].reverse()
-                                data["OPTS"][re_game].reverse()
-                                data["OPTS"][re_game].append(replay_str)
-                                data["OPTS"][re_game].reverse()
+                            # save replay data to the game's replay file
+                            replay_file = f"..\\data\\replays\\{game.lower()}.json"
+                            with open(replay_file, "r+", encoding="utf-8") as file:
+                                replay_data = json.load(file)
+                                replay_data.insert(0, stored_info)
                                 file.seek(0)
-                                json.dump(data, file, indent=4)
+                                json.dump(replay_data, file, indent=4)
+                                file.truncate()
+
+                            # save replay option string to menu.json
+                            menu_file = "..\\data\\menu.json"
+                            with open(menu_file, "r+", encoding="utf-8") as file:
+                                menu_data = json.load(file)
+                                menu_data["OPTS"][re_game].insert(0, replay_str)
+                                file.seek(0)
+                                json.dump(menu_data, file, indent=4)
                                 file.truncate()
 
                             self.game_info.clear()
-                            self.data = self.load_data()
 
                         elif opt_text == "Replays":
-                            if len(self.data["REPLAYS"][game]) > 0:
+                            self.data = self.load_data("menu")
+                            replays = self.load_data(f"replays\\{game.lower()}")
+                            if len(replays) > 0:
                                 self.transition.draw()
                                 self.title = "REPLAYS"
                                 self.opt = 0
@@ -133,7 +138,9 @@ class Arcade:
                         elif self.title == "REPLAYS":
                             self.transition.draw()
                             self.status = Status.IN_REPLAY
-                            stored_info = self.data["REPLAYS"][game][self.opt]
+                            stored_info = self.load_data(f"replays\\{game.lower()}")[
+                                self.opt
+                            ]
                             self.game_info.str_to_data(stored_info)
                             self.opt = 0
                             self.curr.run()

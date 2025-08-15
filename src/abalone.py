@@ -1,6 +1,6 @@
 from game import Game
 from structs import Status
-from abalone_drawable import Board
+from drawables.abalone_drawable import Board
 
 import time
 from dataclasses import dataclass, field
@@ -18,7 +18,7 @@ class Abalone(Game):
     )  # array with "true" board position coordinates, helps with several operations
 
     def __post_init__(self):
-        self.display: Board = Board(dim=(22, 13))
+        self.display = {"BOARD": Board(dim=(22, 13))}
         self.KEYS = {"MOVE": [Key.up, Key.down, Key.left, Key.right]}  # key mapping
 
     def start(self, info: str = "") -> None:
@@ -33,6 +33,9 @@ class Abalone(Game):
         if info != "":
             self.fill_board(info)
 
+    def render(self) -> None:
+        self.display["BOARD"].draw([self.board, self.cursor, self.scores, self.turn])
+
     def get_indexes(
         self, board_pos: list[list[tuple[int, int]]], coors: tuple[int, ...]
     ) -> list[int]:
@@ -43,7 +46,8 @@ class Abalone(Game):
         return [-1, -1]
 
     def fill_board(self, type: str) -> None:
-        R, B = self.display.paint("■", "RED"), self.display.paint("■", "BLUE")
+        R = self.display["BOARD"].paint("■", "RED")
+        B = self.display["BOARD"].paint("■", "BLUE")
         positions = ()
         if type == "classic":
             positions = (
@@ -80,8 +84,10 @@ class Abalone(Game):
 
     def check_inline_count(self, team: bool) -> int:
         b, bp, c, p = self.board, self.BOARD_POS, self.cursor, self.play_start
-        R, B = self.display.paint("■", "RED"), self.display.paint("■", "BLUE")
-        RC, BC = self.display.paint("▣", "RED"), self.display.paint("▣", "BLUE")
+        R = self.display["BOARD"].paint("■", "RED")
+        B = self.display["BOARD"].paint("■", "BLUE")
+        RC = self.display["BOARD"].paint("▣", "RED")
+        BC = self.display["BOARD"].paint("▣", "BLUE")
         count = 1
 
         dynamic, static = list(bp[c[0]][c[1]]), list(bp[p[0]][p[1]])
@@ -129,7 +135,8 @@ class Abalone(Game):
         bp_c, bp_p = bp[c[0]][c[1]], bp[p[0]][p[1]]
         bp_c_i, bp_p_i = self.get_indexes(bp, bp_c), self.get_indexes(bp, bp_p)
         BASE_IDX_VECTOR = [bp_c_i, bp_p_i]
-        R, B = self.display.paint("■", "RED"), self.display.paint("■", "BLUE")
+        R = self.display["BOARD"].paint("■", "RED")
+        B = self.display["BOARD"].paint("■", "BLUE")
 
         if b[bp_c_i[0]][bp_c_i[1]] == "◘":
             self.idx_vector = copy(BASE_IDX_VECTOR)
@@ -222,7 +229,8 @@ class Abalone(Game):
 
     def check_move(self) -> int:
         b, c = self.board, self.cursor
-        RC, BC = self.display.paint("▣", "RED"), self.display.paint("▣", "BLUE")
+        RC = self.display["BOARD"].paint("▣", "RED")
+        BC = self.display["BOARD"].paint("▣", "BLUE")
 
         if self.check_inline_pos():
             if (curr_count := self.check_inline_count(True)) > 0:
@@ -235,11 +243,13 @@ class Abalone(Game):
             return 3
         return -1
 
-    def on_press(self, key: KeyCode, info: list[Any] = []) -> None:
+    def on_press(self, key: KeyCode) -> None:
         try:
             b, c, p = self.board, self.cursor, self.play_start
-            R, B = self.display.paint("■", "RED"), self.display.paint("■", "BLUE")
-            RC, BC = self.display.paint("▣", "RED"), self.display.paint("▣", "BLUE")
+            R = self.display["BOARD"].paint("■", "RED")
+            B = self.display["BOARD"].paint("■", "BLUE")
+            RC = self.display["BOARD"].paint("▣", "RED")
+            BC = self.display["BOARD"].paint("▣", "BLUE")
 
             if (
                 key in list(self.KEYS["MOVE"]) + [Key.space]
@@ -265,7 +275,7 @@ class Abalone(Game):
                 )[self.KEYS["MOVE"].index(key)]
                 c[0] = min(8, max(0, c[0] + shift[0]))
                 c[1] = min(len(b[c[0]]) - 1, max(0, c[1] + shift[1]))
-                self.display.draw([self.board, self.cursor, self.scores, self.turn])
+                self.render()
 
             elif key == Key.space:
                 if p == []:
@@ -303,7 +313,7 @@ class Abalone(Game):
                             self.turn = not self.turn
                         self.idx_vector = []
                 if self.scores["B" if self.turn else "R"] < 6:
-                    self.display.draw([self.board, self.cursor, self.scores, self.turn])
+                    self.render()
                 else:
                     self.arcade.transition.draw()
                     if self.arcade.status != Status.IN_REPLAY:
@@ -333,6 +343,6 @@ class Abalone(Game):
     def run(self):
         try:
             self.start("belgian_daisy")
-            self.display.draw([self.board, self.cursor, self.scores, self.turn])
+            self.render()
         except KeyboardInterrupt:
             pass

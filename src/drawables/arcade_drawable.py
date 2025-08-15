@@ -1,4 +1,4 @@
-from drawable import Drawable
+from drawables.drawable import Drawable
 from structs import Status
 from dataclasses import dataclass, field
 from typing import Any
@@ -78,6 +78,9 @@ class Menu(Drawable):
     game: int = field(default_factory=int)
     curr: Any = None
     status: Status = Status.PRE_GAME
+
+    def __post_init__(self):
+        self.data = self.load_data("menu")
 
     def update(self, values: list[Any]) -> None:
         self.title, self.option, self.game, self.curr, self.status = values

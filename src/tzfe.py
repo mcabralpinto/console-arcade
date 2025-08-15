@@ -1,5 +1,5 @@
 from game import Game
-from tzfe_drawable import Board
+from drawables.tzfe_drawable import Board
 from structs import Move2048 as Move, Status
 
 import time
@@ -16,7 +16,7 @@ class TZFE(Game):
     SIZE: int = 4  # board size
 
     def __post_init__(self):
-        self.display: Board = Board(dim=(self.SIZE * 5 + 1, self.SIZE * 2 + 3))
+        self.display = {"BOARD": Board(dim=(self.SIZE * 5 + 1, self.SIZE * 2 + 3))}
         self.KEYS = {"MOVE": [Key.up, Key.down, Key.left, Key.right]}  # key mapping
 
     def start(self) -> None:
@@ -25,6 +25,9 @@ class TZFE(Game):
         self.free_cells: int = self.SIZE * self.SIZE  # number of free cells
         if self.arcade.status != Status.IN_REPLAY:
             self.arcade.game_info.data["CELLS"] = []
+
+    def render(self, phase: int = 0) -> None:
+        self.display["BOARD"].draw([self.board, self.score, self.moves, phase])
 
     def can_merge(self) -> bool:
         for key in self.KEYS["MOVE"]:
@@ -110,6 +113,7 @@ class TZFE(Game):
         return b
 
     def on_press(self, key: KeyCode, info: list[Any] = []) -> None:
+        # new cells to be added to the board (for replays)
         c: Optional[tuple[int, int, str]] = info[0] if info != [] else None
         try:
             if key in self.KEYS["MOVE"]:
@@ -120,21 +124,24 @@ class TZFE(Game):
                     for i in range(5 if key in self.KEYS["MOVE"][0:1] else 4):
                         if c != None and self.arcade.status != Status.IN_REPLAY:
                             break
-                        self.display.draw([self.board, self.score, self.moves, i + 1])
+                        self.render(i + 1)
                         time.sleep(0.015)
                     r: bool = self.arcade.status == Status.IN_REPLAY
                     cells, proceed = self.fill_board(1, [c] if r and c != None else [])
-                    if r:
+                    if c == None:
                         self.arcade.game_info.keys.append(key)
                         self.arcade.game_info.data["CELLS"] += cells
                     if c == None or r:
-                        self.display.draw([self.board, self.score, self.moves, 0])
+                        self.render(0)
                     if not proceed:
                         time.sleep(1)
-                        self.arcade.game_info.score = self.score
-                        self.arcade.game_info.data["CELLS"].reverse()
+                        if c == None:
+                            self.arcade.game_info.score = self.score
+                            self.arcade.game_info.data["CELLS"].reverse()
                         self.arcade.transition.draw()
-                        self.arcade.status = Status.POST_GAME
+                        self.arcade.status = (
+                            Status.POST_GAME if c == None else Status.PRE_GAME
+                        )
                         self.arcade.on_press(Key.up)
             elif key == Key.esc:
                 self.arcade.transition.draw()
@@ -146,15 +153,14 @@ class TZFE(Game):
     def run_replay(self):
         self.board = [[""] * self.SIZE for _ in range(self.SIZE)]
         cells = deepcopy(self.arcade.game_info.data["CELLS"])
-        self.fill_board(2, [cells.pop() for _ in range(2)])
-        self.display.draw([self.board, self.score, self.moves, 0])
+        self.fill_board(2, [cells.pop() for _ in range(2)]) 
+        self.render(0)
         for key in self.arcade.game_info.keys:
-            time.sleep(0.2)
+            time.sleep(0.05)
             if self.arcade.status != Status.IN_REPLAY:
                 break
             self.on_press(key, [cells.pop()])
-        self.arcade.game_info.clear()
-        self.arcade.status = Status.PRE_GAME
+        self.arcade.game_info.clear() 
 
     def run(self):
         try:
@@ -162,6 +168,6 @@ class TZFE(Game):
             if self.arcade.status != Status.IN_REPLAY:
                 cells, _ = self.fill_board(2, [])
                 self.arcade.game_info.data["CELLS"] += cells
-                self.display.draw([self.board, self.score, self.moves, 0])
+                self.render(0)
         except KeyboardInterrupt:
             pass

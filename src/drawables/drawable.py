@@ -9,9 +9,10 @@ import os
 class Drawable(ABC):
     dim: tuple[int, int]
 
-    # loads data from the data.json file
-    def load_data(self) -> dict[str, Any]:
-        with open("..\\data\\data.json", "r", encoding="utf-8") as file:
+    # loads data from the a json file
+    def load_data(self, dir: str) -> dict[str, Any]:
+        data_path = os.path.join("..", f"data\{dir}.json")
+        with open(data_path, "r", encoding="utf-8") as file:
             return json.load(file)
 
     # returns the ANSI escape sequence to move the cursor (x, y) units
@@ -27,7 +28,7 @@ class Drawable(ABC):
 
     # returns a colored string
     def paint(self, char: str, color: str) -> str:
-        colors = self.load_data()["COLORS"]
+        colors = self.load_data("misc")["COLORS"]
         return f"{colors[color]}{char}\033[0m"
 
     # draws the content of the drawable
@@ -36,6 +37,6 @@ class Drawable(ABC):
 
     # buffer
     def draw(self, values: list[Any] = []) -> None:
+        self.data = self.load_data("menu")
         self.start_pos()
-        self.data = self.load_data()
         self.content(values)

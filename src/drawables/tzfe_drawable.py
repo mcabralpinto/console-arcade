@@ -1,4 +1,4 @@
-from drawable import Drawable
+from drawables.drawable import Drawable
 from structs import Move2048 as Move
 
 from dataclasses import dataclass, field
@@ -19,7 +19,7 @@ class Board(Drawable):
     def content(self, values: list[Any]) -> None:
         self.update(values)
         SIZE: int = (self.dim[0] - 1) // 5
-        DATA: dict[str, dict[str, str]] = self.data["GAMES"]["2048"]
+        DATA: dict[str, dict[str, str]] = self.load_data("games\\2048")
 
         board_str: list[str] = []
         board_str.append(f"┌{'────┬' * (SIZE - 1)}────┐")
