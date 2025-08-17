@@ -1,4 +1,4 @@
-from drawables.drawable import Drawable
+from drawable import Drawable
 from structs import Status
 from dataclasses import dataclass, field
 from typing import Any

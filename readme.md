@@ -38,36 +38,41 @@ Console Arcade is a Python-based project I've been working that includes an ever
     ```
 
 2. **Run the main script:**
+    To run the arcade menu, run it normally:
+
     ```sh
     python main.py
     ```
 
+    To run a specific game, pass its name as an argument after the command. Currently the supported games are:
+
+    ```sh
+    abalone
+    2048
+    ```
+
 ## Project Components
 
-### [`src/main.py`](command:_github.copilot.openRelativePath?%5B%7B%22scheme%22%3A%22file%22%2C%22authority%22%3A%22%22%2C%22path%22%3A%22%2Fc%3A%2FUsers%2FUtilizador%2Fgit%2Fconsole-arcade%2Fsrc%2Fmain.py%22%2C%22query%22%3A%22%22%2C%22fragment%22%3A%22%22%7D%2C%22eac2b851-7904-4c88-88fc-04a240d03d6b%22%5D "c:\Users\Utilizador\git\console-arcade\src\main.py")
+### Arcade
 
-The entry point of the application. It initializes and runs the `Arcade` class.
+The arcade module contains the core menu system and navigation logic for the console arcade.
+The main `Arcade` class at [`arcade.py`](src/arcade/arcade.py) handles menu navigation, game launching, replay management, and keyboard input processing.
 
-### [`src/arcade.py`](command:_github.copilot.openRelativePath?%5B%7B%22scheme%22%3A%22file%22%2C%22authority%22%3A%22%22%2C%22path%22%3A%22%2Fc%3A%2FUsers%2FUtilizador%2Fgit%2Fconsole-arcade%2Fsrc%2Farcade.py%22%2C%22query%22%3A%22%22%2C%22fragment%22%3A%22%22%7D%2C%22eac2b851-7904-4c88-88fc-04a240d03d6b%22%5D "c:\Users\Utilizador\git\console-arcade\src\arcade.py")
+### Abstract Game Classes
 
-The `Arcade` class is the central class throughout the app. It ties all of its functionalities together, handling the menu system logic, running games and replays, and loading necessary data.
+There are two main classes which every game inherits: the base class `Game` (at [`game.py`](src/game.py)), which defines the common interface for all games in the arcade, and `Drawable` (at [`drawable.py`](src/drawable.py)), which provides methods for rendering game elements.
 
-- **Main Methods:**
-  - `run`: Boots up the arcade and initializes the keypress reading system.
-  - `on_press`: The program's keypress handler. When a game is running, redirects keypresses to its `on_press` function.
-  - `load_data`: Loads data from `data.json`.
+### Abalone
 
-### [`src/drawable.py`](command:_github.copilot.openRelativePath?%5B%7B%22scheme%22%3A%22file%22%2C%22authority%22%3A%22%22%2C%22path%22%3A%22%2Fc%3A%2FUsers%2FUtilizador%2Fgit%2Fconsole-arcade%2Fsrc%2Fdrawable.py%22%2C%22query%22%3A%22%22%2C%22fragment%22%3A%22%22%7D%2C%22eac2b851-7904-4c88-88fc-04a240d03d6b%22%5D "c:\Users\Utilizador\git\console-arcade\src\drawable.py") and subclasses
+Implementation of the Abalone board game, a two-player board game where players attempt to push each other's marbles off the board. The entire logic of the game, including piece movement mechanics and move validation, was implemented from scratch.
 
-The `Drawable` class is an abstract base class for drawable objects in the console. Its primary function is to draw content and control the cursor position.
+### 2048 (TFZE)
 
-- **Main Methods:**
-  - `draw`: Draws the content of the drawable.
-  - `move` & `start_pos`: Allow for moving the cursor during the drawing process.
+Implementation of 2048 (TFZE), a game whose goal is to combine numbered tiles on a 4x4 grid. It also features an attempt at smooth sliding tile animations in a console environment.
 
-### [`data/data.json`](command:_github.copilot.openRelativePath?%5B%7B%22scheme%22%3A%22file%22%2C%22authority%22%3A%22%22%2C%22path%22%3A%22%2Fc%3A%2FUsers%2FUtilizador%2Fgit%2Fconsole-arcade%2Fdata%2Fdata.json%22%2C%22query%22%3A%22%22%2C%22fragment%22%3A%22%22%7D%2C%22eac2b851-7904-4c88-88fc-04a240d03d6b%22%5D "c:\Users\Utilizador\git\console-arcade\data\data.json")
+### Data
 
-Contains the static data which is used while the program is running, such as menu options and titles, replay details, and other relevant information.
+Contains relevant game data in JSON format, including pre-loaded graphics, special characters, and replay data for all of the available games.
 
 ## License
 
@@ -76,7 +81,3 @@ This project is licensed under the MIT License. See the LICENSE file for details
 ## Contributing
 
 Contributions are welcome! Please open an issue or submit a pull request for any changes.
-
-## Contact
-
-For any inquiries, please contact the project maintainer.

@@ -1,4 +1,4 @@
-from drawables.drawable import Drawable
+from drawable import Drawable
 from structs import Move2048 as Move
 
 from dataclasses import dataclass, field

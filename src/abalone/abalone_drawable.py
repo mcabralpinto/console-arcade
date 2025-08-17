@@ -1,4 +1,4 @@
-from drawables.drawable import Drawable
+from drawable import Drawable
 from dataclasses import dataclass, field
 from typing import Any
 

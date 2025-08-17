@@ -1,9 +1,8 @@
 # cd git\console-arcade && .\env\Scripts\activate && cd src && python main.py
-from drawables.arcade_drawable import Border, Transition, Menu
-from abalone import Abalone
-from tzfe import TZFE
-from structs import Status
-from game_info import GameInfo
+from arcade.arcade_drawable import Border, Transition, Menu
+from abalone.abalone import Abalone
+from tzfe.tzfe import TZFE
+from structs import Status, GameInfo
 
 import os
 import json

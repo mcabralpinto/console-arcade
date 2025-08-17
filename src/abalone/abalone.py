@@ -1,6 +1,6 @@
 from game import Game
 from structs import Status
-from drawables.abalone_drawable import Board
+from abalone.abalone_drawable import Board
 
 import time
 from dataclasses import dataclass, field
@@ -20,6 +20,8 @@ class Abalone(Game):
     def __post_init__(self):
         self.display = {"BOARD": Board(dim=(22, 13))}
         self.KEYS = {"MOVE": [Key.up, Key.down, Key.left, Key.right]}  # key mapping
+        self.standalone = self.arcade is None
+        self.running = True
 
     def start(self, info: str = "") -> None:
         self.board: list[list[str]] = [
@@ -251,7 +253,7 @@ class Abalone(Game):
             RC = self.display["BOARD"].paint("▣", "RED")
             BC = self.display["BOARD"].paint("▣", "BLUE")
 
-            if (
+            if (not self.standalone) and (
                 key in list(self.KEYS["MOVE"]) + [Key.space]
                 and self.arcade.status != Status.IN_REPLAY
             ):
@@ -315,18 +317,24 @@ class Abalone(Game):
                 if self.scores["B" if self.turn else "R"] < 6:
                     self.render()
                 else:
-                    self.arcade.transition.draw()
-                    if self.arcade.status != Status.IN_REPLAY:
-                        self.arcade.game_info.score = self.scores
-                        self.arcade.status = Status.POST_GAME
+                    if (not self.standalone):
+                        self.arcade.transition.draw()
+                        if self.arcade.status != Status.IN_REPLAY:
+                            self.arcade.game_info.score = self.scores
+                            self.arcade.status = Status.POST_GAME
+                        else:
+                            self.arcade.status = Status.PRE_GAME
+                        self.arcade.on_press(Key.up)
                     else:
-                        self.arcade.status = Status.PRE_GAME
-                    self.arcade.on_press(Key.up)
+                        self.running = False
 
             elif key == Key.esc:
-                self.arcade.transition.draw()
-                self.arcade.status = Status.PRE_GAME
-                self.arcade.on_press(Key.up)
+                if (not self.standalone):
+                    self.arcade.transition.draw()
+                    self.arcade.status = Status.PRE_GAME
+                    self.arcade.on_press(Key.up)
+                else: 
+                    self.running = False
 
         except AttributeError:
             pass
@@ -344,5 +352,28 @@ class Abalone(Game):
         try:
             self.start("belgian_daisy")
             self.render()
+
+            if self.standalone:
+                from pynput import keyboard
+                import os
+                
+                def on_key_press(key):
+                    self.on_press(key)
+                    if not self.running:
+                        listener.stop()
+                
+                with keyboard.Listener(on_press=on_key_press) as listener:
+                    listener.join()
+
+                os.system('cls' if os.name == 'nt' else 'clear')
+
         except KeyboardInterrupt:
             pass
+
+
+if __name__ == "__main__":
+    # import os
+    # import sys
+    # sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+    abalone = Abalone(None)
+    abalone.run()

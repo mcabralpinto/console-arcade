@@ -1,7 +1,9 @@
 import os
 import sys
 import ctypes
-from arcade import Arcade
+from arcade.arcade import Arcade
+from abalone.abalone import Abalone
+from tzfe.tzfe import TZFE
 
 
 class CONSOLE_CURSOR_INFO(ctypes.Structure):
@@ -54,8 +56,22 @@ def clear_console():
 def main():
     hide_cursor()
     clear_console()
-    arcade = Arcade()
-    arcade.run()
+    if len(sys.argv) > 1:
+        arg = sys.argv[1].lower()
+        match arg:
+            case "abalone":
+                game = Abalone(None)
+                game.run()
+            case "2048":
+                game = TZFE(None)
+                game.run()
+            case _:
+                arcade = Arcade()
+                arcade.run()
+    else:
+        arcade = Arcade()
+        arcade.run()
+    clear_console()
     show_cursor()
 
 

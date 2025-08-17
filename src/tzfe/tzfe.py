@@ -1,5 +1,5 @@
 from game import Game
-from drawables.tzfe_drawable import Board
+from tzfe.tzfe_drawable import Board
 from structs import Move2048 as Move, Status
 
 import time
@@ -18,12 +18,14 @@ class TZFE(Game):
     def __post_init__(self):
         self.display = {"BOARD": Board(dim=(self.SIZE * 5 + 1, self.SIZE * 2 + 3))}
         self.KEYS = {"MOVE": [Key.up, Key.down, Key.left, Key.right]}  # key mapping
+        self.standalone = self.arcade is None
+        self.running = True
 
     def start(self) -> None:
         self.score: int = 0  # game score
         self.board: list[list[str]] = [[""] * self.SIZE for _ in range(self.SIZE)]
         self.free_cells: int = self.SIZE * self.SIZE  # number of free cells
-        if self.arcade.status != Status.IN_REPLAY:
+        if not self.standalone and self.arcade.status != Status.IN_REPLAY:
             self.arcade.game_info.data["CELLS"] = []
 
     def render(self, phase: int = 0) -> None:
@@ -122,52 +124,85 @@ class TZFE(Game):
                     self.board = deepcopy(aux_board)
 
                     for i in range(5 if key in self.KEYS["MOVE"][0:1] else 4):
-                        if c != None and self.arcade.status != Status.IN_REPLAY:
+                        if (not self.standalone) and (
+                            c != None and self.arcade.status != Status.IN_REPLAY
+                        ):
                             break
                         self.render(i + 1)
                         time.sleep(0.015)
-                    r: bool = self.arcade.status == Status.IN_REPLAY
+                    r: bool = (
+                        self.arcade.status == Status.IN_REPLAY
+                        if not self.standalone
+                        else False
+                    )
                     cells, proceed = self.fill_board(1, [c] if r and c != None else [])
-                    if c == None:
+                    if not self.standalone and c == None:
                         self.arcade.game_info.keys.append(key)
                         self.arcade.game_info.data["CELLS"] += cells
                     if c == None or r:
                         self.render(0)
                     if not proceed:
                         time.sleep(1)
-                        if c == None:
-                            self.arcade.game_info.score = self.score
-                            self.arcade.game_info.data["CELLS"].reverse()
-                        self.arcade.transition.draw()
-                        self.arcade.status = (
-                            Status.POST_GAME if c == None else Status.PRE_GAME
-                        )
-                        self.arcade.on_press(Key.up)
+                        if not self.standalone:
+                            if c == None:
+                                self.arcade.game_info.score = self.score
+                                self.arcade.game_info.data["CELLS"].reverse()
+                            self.arcade.transition.draw()
+                            self.arcade.status = (
+                                Status.POST_GAME if c == None else Status.PRE_GAME
+                            )
+                            self.arcade.on_press(Key.up)
+                        else:
+                            self.running = False
+
             elif key == Key.esc:
-                self.arcade.transition.draw()
-                self.arcade.status = Status.PRE_GAME
-                self.arcade.on_press(Key.up)
+                if not self.standalone:
+                    self.arcade.transition.draw()
+                    self.arcade.status = Status.PRE_GAME
+                    self.arcade.on_press(Key.up)
+                else:
+                    self.running = False
+
         except AttributeError:
             pass
 
     def run_replay(self):
         self.board = [[""] * self.SIZE for _ in range(self.SIZE)]
         cells = deepcopy(self.arcade.game_info.data["CELLS"])
-        self.fill_board(2, [cells.pop() for _ in range(2)]) 
+        self.fill_board(2, [cells.pop() for _ in range(2)])
         self.render(0)
         for key in self.arcade.game_info.keys:
             time.sleep(0.05)
             if self.arcade.status != Status.IN_REPLAY:
                 break
             self.on_press(key, [cells.pop()])
-        self.arcade.game_info.clear() 
+        self.arcade.game_info.clear()
 
     def run(self):
         try:
             self.start()
-            if self.arcade.status != Status.IN_REPLAY:
+            replay = (
+                self.arcade.status != Status.IN_REPLAY if not self.standalone else False
+            )
+            if not replay:
                 cells, _ = self.fill_board(2, [])
-                self.arcade.game_info.data["CELLS"] += cells
+                if not self.standalone:
+                    self.arcade.game_info.data["CELLS"] += cells
                 self.render(0)
+
+            if self.standalone:
+                from pynput import keyboard
+                import os
+
+                def on_key_press(key):
+                    self.on_press(key)
+                    if not self.running:
+                        listener.stop()
+
+                with keyboard.Listener(on_press=on_key_press) as listener:
+                    listener.join()
+
+                os.system("cls" if os.name == "nt" else "clear")
+
         except KeyboardInterrupt:
             pass
