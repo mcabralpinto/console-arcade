@@ -49,6 +49,7 @@ Console Arcade is a Python-based project I've been working that includes an ever
     ```sh
     abalone
     2048
+    scrabble
     ```
 
 ## Project Components
@@ -64,11 +65,15 @@ There are two main classes which every game inherits: the base class `Game` (at 
 
 ### Abalone
 
-Implementation of the Abalone board game, a two-player board game where players attempt to push each other's marbles off the board. The entire logic of the game, including piece movement mechanics and move validation, was implemented from scratch.
+Two-player board game where players attempt to push each other's marbles off the board. The entire logic of the game, including piece movement mechanics and move validation, was implemented from scratch.
 
 ### 2048 (TFZE)
 
-Implementation of 2048 (TFZE), a game whose goal is to combine numbered tiles on a 4x4 grid. It also features an attempt at smooth sliding tile animations in a console environment.
+A console spin on a viral web game whose goal is to combine numbered tiles on a 4x4 grid. It also features an attempt at smooth sliding tile animations in a console environment.
+
+### Scrabble
+
+Classic board game where players use letter tiles to create words on a grid, scoring based on the sum of the tile values and existing modifiers. This implementation includes all basic mechanics such as tile placement, exchanging tiles, and challenging words. Not playable from the arcade menu yet.
 
 ### Data
 

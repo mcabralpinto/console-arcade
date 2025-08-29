@@ -28,7 +28,7 @@ class Abalone(Game):
             ["·" for _ in range(9 - abs(4 - i))] for i in range(9)
         ]
         self.cursor: list[int] = [4, 4]  # cursor position
-        self.play_start: list[int] = []  # coors of the starting position of a play
+        self.selected: list[int] = []  # coordinates of the currently selected piece
         self.idx_vector: list[list[int]] = []  # indexes of all pieces moved in a play
         self.turn: bool = True  # True if it's the red player's turn, False otherwise
         self.scores: dict[str, int] = {"R": 0, "B": 0}  # scores of both players
@@ -74,7 +74,7 @@ class Abalone(Game):
             self.board[piece[0]][piece[1]] = piece[2]
 
     def check_inline_pos(self) -> bool:
-        bp, c, p = self.BOARD_POS, self.cursor, self.play_start
+        bp, c, p = self.BOARD_POS, self.cursor, self.selected
         if p[0] == c[0] and abs(p[1] - c[1]) <= 3:
             return True  # horizontal
         if (
@@ -85,7 +85,7 @@ class Abalone(Game):
         return False
 
     def check_inline_count(self, team: bool) -> int:
-        b, bp, c, p = self.board, self.BOARD_POS, self.cursor, self.play_start
+        b, bp, c, p = self.board, self.BOARD_POS, self.cursor, self.selected
         R = self.display["BOARD"].paint("■", "RED")
         B = self.display["BOARD"].paint("■", "BLUE")
         RC = self.display["BOARD"].paint("▣", "RED")
@@ -133,7 +133,7 @@ class Abalone(Game):
         return count
 
     def check_side(self) -> bool:
-        b, bp, c, p = self.board, self.BOARD_POS, self.cursor, self.play_start
+        b, bp, c, p = self.board, self.BOARD_POS, self.cursor, self.selected
         bp_c, bp_p = bp[c[0]][c[1]], bp[p[0]][p[1]]
         bp_c_i, bp_p_i = self.get_indexes(bp, bp_c), self.get_indexes(bp, bp_p)
         BASE_IDX_VECTOR = [bp_c_i, bp_p_i]
@@ -247,7 +247,7 @@ class Abalone(Game):
 
     def on_press(self, key: KeyCode) -> None:
         try:
-            b, c, p = self.board, self.cursor, self.play_start
+            b, c, p = self.board, self.cursor, self.selected
             R = self.display["BOARD"].paint("■", "RED")
             B = self.display["BOARD"].paint("■", "BLUE")
             RC = self.display["BOARD"].paint("▣", "RED")
@@ -282,10 +282,10 @@ class Abalone(Game):
             elif key == Key.space:
                 if p == []:
                     if b[c[0]][c[1]] == (RC if self.turn else BC):
-                        self.play_start = [c[0], c[1]]
+                        self.selected = [c[0], c[1]]
                 else:
                     if p == [c[0], c[1]]:
-                        self.play_start = []
+                        self.selected = []
                     else:
                         validity = self.check_move()
                         iv = self.idx_vector
@@ -297,7 +297,7 @@ class Abalone(Game):
                                     else (B if i > 1 else BC)
                                 )
                                 b[iv[i + 1][0]][iv[i + 1][1]] = "·"
-                            self.play_start = []
+                            self.selected = []
                             self.turn = not self.turn
                         if validity == 2:
                             if iv[0][0] in list(range(9)):
@@ -311,7 +311,7 @@ class Abalone(Game):
                         if validity == 1:
                             b[c[0]][c[1]] = b[p[0]][p[1]]
                             b[p[0]][p[1]] = "·"
-                            self.play_start = []
+                            self.selected = []
                             self.turn = not self.turn
                         self.idx_vector = []
                 if self.scores["B" if self.turn else "R"] < 6:
@@ -369,11 +369,3 @@ class Abalone(Game):
 
         except KeyboardInterrupt:
             pass
-
-
-if __name__ == "__main__":
-    # import os
-    # import sys
-    # sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-    abalone = Abalone(None)
-    abalone.run()

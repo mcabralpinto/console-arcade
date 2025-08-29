@@ -1,4 +1,3 @@
-# cd git\console-arcade && .\env\Scripts\activate && cd src && python main.py
 from arcade.arcade_drawable import Border, Transition, Menu
 from abalone.abalone import Abalone
 from tzfe.tzfe import TZFE

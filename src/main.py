@@ -1,9 +1,16 @@
+# cd git\console-arcade && .\env\Scripts\activate && cd src && python main.py
 import os
 import sys
 import ctypes
 from arcade.arcade import Arcade
 from abalone.abalone import Abalone
 from tzfe.tzfe import TZFE
+from scrabble.scrabble import Scrabble
+
+if os.name == "nt":
+    import msvcrt
+else:
+    import select
 
 
 class CONSOLE_CURSOR_INFO(ctypes.Structure):
@@ -54,25 +61,34 @@ def clear_console():
 
 
 def main():
-    hide_cursor()
-    clear_console()
-    if len(sys.argv) > 1:
-        arg = sys.argv[1].lower()
-        match arg:
-            case "abalone":
-                game = Abalone(None)
-                game.run()
-            case "2048":
-                game = TZFE(None)
-                game.run()
-            case _:
-                arcade = Arcade()
-                arcade.run()
-    else:
-        arcade = Arcade()
-        arcade.run()
-    clear_console()
-    show_cursor()
+    try:
+        hide_cursor()
+        clear_console()
+
+        if len(sys.argv) > 1:
+            arg = sys.argv[1].lower()
+            match arg:
+                case "abalone":
+                    game = Abalone(None)
+                    game.run()
+                case "2048":
+                    game = TZFE(None)
+                    game.run()
+                case "scrabble":
+                    game = Scrabble(None)
+                    game.run()
+                case _:
+                    arcade = Arcade()
+                    arcade.run()
+        else:
+            arcade = Arcade()
+            arcade.run()
+
+    except KeyboardInterrupt:
+        pass
+    finally:
+        show_cursor()
+        # clear_console()
 
 
 if __name__ == "__main__":

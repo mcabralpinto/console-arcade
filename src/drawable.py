@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from typing import Any
 import json
 import os
+import re
 
 
 @dataclass
@@ -27,9 +28,15 @@ class Drawable(ABC):
         print("\033[H" + "\033[B" * y_pad + "\033[C" * x_pad, end="", flush=True)
 
     # returns a colored string
-    def paint(self, char: str, color: str) -> str:
+    def paint(self, string: str, color: str) -> str:
+        if color == "":
+            return string
         colors = self.load_data("misc")["COLORS"]
-        return f"{colors[color]}{char}\033[0m"
+        return f"{colors[color]}{string}\033[0m"
+
+    # return a string without ANSI escape sequences
+    def strip_ansi(self, s: str) -> str:
+        return re.sub(r'\x1b\[[0-9;]*m', '', s)
 
     # draws the content of the drawable
     @abstractmethod

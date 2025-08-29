@@ -181,9 +181,11 @@ class TZFE(Game):
     def run(self):
         try:
             self.start()
-            replay = (
-                self.arcade.status != Status.IN_REPLAY if not self.standalone else False
-            )
+            if not self.standalone:
+                replay = self.arcade.status == Status.IN_REPLAY
+            else:
+                replay = False
+
             if not replay:
                 cells, _ = self.fill_board(2, [])
                 if not self.standalone:
