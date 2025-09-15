@@ -1,6 +1,7 @@
 from game import Game
-from tzfe.tzfe_drawable import Board
-from structs import Move2048 as Move, Status, Coordinate
+from utils import Status, Coordinate
+from tzfe.drawable import Board
+from tzfe.utils import Move
 
 import time
 from dataclasses import dataclass, field
@@ -210,7 +211,7 @@ class TZFE(Game):
                 with keyboard.Listener(on_press=on_key_press) as listener:
                     listener.join()
 
-                # os.system("cls" if os.name == "nt" else "clear")
+                os.system("cls" if os.name == "nt" else "clear")
 
         except KeyboardInterrupt:
             pass

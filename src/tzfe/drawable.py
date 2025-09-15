@@ -1,5 +1,6 @@
 from drawable import Drawable
-from structs import Move2048 as Move, Coordinate
+from utils import Coordinate
+from tzfe.utils import Move
 
 from dataclasses import dataclass, field
 from typing import Any, Generator

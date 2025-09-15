@@ -2,7 +2,7 @@ from drawable import Drawable
 from dataclasses import dataclass, field
 from typing import Any
 
-from structs import Coordinate
+from utils import Coordinate
 
 
 @dataclass

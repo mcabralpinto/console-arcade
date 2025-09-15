@@ -5,7 +5,7 @@ import json
 import os
 import re
 
-from structs import Coordinate
+from utils import Coordinate
 
 
 @dataclass

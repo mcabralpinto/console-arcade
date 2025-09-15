@@ -1,7 +1,8 @@
 import random
 from game import Game
-from scrabble.scrabble_drawable import Board
-from structs import TileScrabble, Status, Coordinate
+from scrabble.drawable import Board
+from utils import Status, Coordinate
+from scrabble.utils import Tile
 
 from dataclasses import dataclass
 from pynput.keyboard import Key, KeyCode
@@ -23,14 +24,14 @@ class Scrabble(Game):
         random.shuffle(self.data["LETTERS"])
 
         # game board
-        self.board: list[list[TileScrabble | None]] = [[None] * 15 for _ in range(15)]
+        self.board: list[list[Tile | None]] = [[None] * 15 for _ in range(15)]
 
         # cursor position
         self.cursor: Coordinate = Coordinate(x=7, y=7)
 
         # each player's score and tiles
         self.scores: dict[int, int] = {0: 0, 1: 0}
-        self.tiles: dict[int, dict[str, list[TileScrabble]]] = {
+        self.tiles: dict[int, dict[str, list[Tile]]] = {
             0: {"HAND": [], "PLAY": []},
             1: {"HAND": [], "PLAY": []},
         }
@@ -79,10 +80,10 @@ class Scrabble(Game):
         self.tiles[self.turn % 2]["PLAY"].clear()
         self.fill_hand(self.tiles[self.turn % 2]["HAND"])
 
-    def fill_hand(self, hand: list[TileScrabble]) -> None:
+    def fill_hand(self, hand: list[Tile]) -> None:
         while len(hand) < 7 and self.data["LETTERS"]:
             letter = self.data["LETTERS"].pop(0)
-            hand.append(TileScrabble(letter=letter, value=self.data["VALUES"][letter]))
+            hand.append(Tile(letter=letter, value=self.data["VALUES"][letter]))
 
     def get_next_position(self, key: KeyCode, delete: bool = False) -> tuple[int, int]:
         x, y = self.cursor
@@ -133,7 +134,7 @@ class Scrabble(Game):
     def adjacent_positions(
         self,
         new: Coordinate,
-        placed: list[TileScrabble],
+        placed: list[Tile],
     ) -> bool:
         new = deepcopy(new)
 
@@ -157,7 +158,7 @@ class Scrabble(Game):
         # passed!
         return True
 
-    def check_tile_validity(self, key: KeyCode) -> TileScrabble:
+    def check_tile_validity(self, key: KeyCode) -> Tile:
         play = self.tiles[self.turn % 2]["PLAY"]
         hand = self.tiles[self.turn % 2]["HAND"]
         C = self.cursor
@@ -203,7 +204,7 @@ class Scrabble(Game):
 
         if len(T["PLAY"]) < 2:
             return False
-        
+
         # no letter has been played
         if len(self.data["LETTERS"]) == 86 and not self.tiles[last_turn]["PLAY"]:
             # check if touching center of the board
@@ -217,9 +218,7 @@ class Scrabble(Game):
 
         return False
 
-    def score_play(
-        self, play: list[TileScrabble], direction, branch=True, display=False
-    ):
+    def score_play(self, play: list[Tile], direction, branch=True, display=False):
         # check whether it's a play or a pass
         if not play:
             return 0
@@ -338,7 +337,7 @@ class Scrabble(Game):
                 tile.position = Coordinate(-1, -1)
                 self.cursor = Coordinate(x, y)
 
-            elif key == KeyCode.from_char("1"): # confirm play
+            elif key == KeyCode.from_char("1"):  # confirm play
                 if T["PLAY"]:
                     # make sure the play is valid
                     if not self.check_play_validity():
@@ -361,7 +360,7 @@ class Scrabble(Game):
                 # change turn
                 self.change_turn()
 
-            elif key == KeyCode.from_char("2"): # exchange tiles
+            elif key == KeyCode.from_char("2"):  # exchange tiles
                 if not self.exchange:
                     # only activate exchange if no tiles are played
                     if not T["PLAY"]:
@@ -381,7 +380,7 @@ class Scrabble(Game):
                         self.turn += 1
                     self.exchange = False
 
-            elif key == KeyCode.from_char("3"): # challenge word
+            elif key == KeyCode.from_char("3"):  # challenge word
                 if not T["PLAY"] and self.new_words:
                     success = False
                     # see if any new words are not valid
@@ -406,7 +405,7 @@ class Scrabble(Game):
 
                 self.new_words.clear()
 
-            elif key == KeyCode.from_char("4"): # change write direction
+            elif key == KeyCode.from_char("4"):  # change write direction
                 self.direction = not self.direction
 
             elif key == Key.esc:
@@ -449,7 +448,7 @@ class Scrabble(Game):
                 with keyboard.Listener(on_press=on_key_press) as listener:
                     listener.join()
 
-                # os.system("cls" if os.name == "nt" else "clear")
+                os.system("cls" if os.name == "nt" else "clear")
 
         except KeyboardInterrupt:
             pass

@@ -1,5 +1,6 @@
 from drawable import Drawable
-from structs import TileScrabble, Coordinate
+from utils import Coordinate
+from scrabble.utils import Tile
 
 from dataclasses import dataclass, field
 from typing import Any
@@ -11,7 +12,7 @@ class Board(Drawable):
     board: list[list[str]] = field(default_factory=list)
     cursor: Coordinate = field(default_factory=lambda: Coordinate(0, 0))
     scores: dict[int, int] = field(default_factory=dict)
-    tiles: dict[int, dict[str, list[TileScrabble]]] = field(default_factory=dict)
+    tiles: dict[int, dict[str, list[Tile]]] = field(default_factory=dict)
     new_words: list[str] = field(default_factory=list)
     turn: int = field(default_factory=int)
     direction: bool = field(default_factory=bool)
@@ -35,7 +36,7 @@ class Board(Drawable):
 
     def get_display_char(self, row: int, col: int) -> str:
         # get the character to display at a position
-        tile: TileScrabble = self.board[row][col]
+        tile: Tile = self.board[row][col]
         DATA = self.load_data("games\\scrabble")
 
         if self.cursor == (col, row):
@@ -53,7 +54,7 @@ class Board(Drawable):
     def content(self, values: list[Any]) -> None:
         self.update(values)
         S: dict[bool, int] = self.scores
-        T: dict[bool, list[TileScrabble]] = self.tiles
+        T: dict[bool, list[Tile]] = self.tiles
         SIZE: int = (self.dim.x - 1) // 4
         turn = self.turn % 2 == 1
 

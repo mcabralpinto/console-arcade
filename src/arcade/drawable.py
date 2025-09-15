@@ -1,5 +1,5 @@
 from drawable import Drawable
-from structs import Status
+from utils import Status
 from dataclasses import dataclass, field
 from typing import Any
 from datetime import datetime

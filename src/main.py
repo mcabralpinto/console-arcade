@@ -88,7 +88,7 @@ def main():
         pass
     finally:
         show_cursor()
-        # clear_console()
+        clear_console()
 
 
 if __name__ == "__main__":

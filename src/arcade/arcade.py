@@ -1,7 +1,7 @@
-from arcade.arcade_drawable import Border, Transition, Menu
+from arcade.drawable import Border, Transition, Menu
 from abalone.abalone import Abalone
 from tzfe.tzfe import TZFE
-from structs import Status, GameInfo, Coordinate
+from utils import Status, GameInfo, Coordinate
 
 import os
 import json

@@ -1,6 +1,6 @@
 from game import Game
-from structs import Coordinate, Status
-from abalone.abalone_drawable import Board
+from utils import Coordinate, Status
+from abalone.drawable import Board
 
 import time
 from dataclasses import dataclass, field
