@@ -1,5 +1,5 @@
 from drawable import Drawable
-from structs import Move2048 as Move
+from structs import Move2048 as Move, Coordinate
 
 from dataclasses import dataclass, field
 from typing import Any, Generator
@@ -9,7 +9,7 @@ from typing import Any, Generator
 class Board(Drawable):
     board: list[list[str]] = field(default_factory=list)
     score: int = field(default_factory=int)
-    moves: dict[tuple[int, int], Move] = field(default_factory=dict)
+    moves: dict[Coordinate, Move] = field(default_factory=dict)
     phase: int = field(default_factory=int)
 
     def update(self, values: list[Any]) -> None:
@@ -18,7 +18,7 @@ class Board(Drawable):
     # draws the abalone board
     def content(self, values: list[Any]) -> None:
         self.update(values)
-        SIZE: int = (self.dim[0] - 1) // 5
+        SIZE: int = (self.dim.x - 1) // 5
         DATA: dict[str, dict[str, str]] = self.load_data("games\\2048")
 
         board_str: list[str] = []
@@ -34,29 +34,27 @@ class Board(Drawable):
                 board_str.append(f"└{'────┴' * (SIZE - 1)}────┘")
 
         if self.phase == 0:
-            iterable: Generator[tuple[int, int]] = (
-                (i, j)
+            iterable: Generator[Coordinate] = (
+                Coordinate(j, i)
                 for i in range(SIZE)
                 for j in range(SIZE)
                 if self.board[i][j] != ""
             )
         else:
-            iterable: Generator[tuple[int, int]] = (k for k in tuple(self.moves.keys()))
+            iterable: Generator[Coordinate] = (k for k in tuple(self.moves.keys()))
 
-        for i, j in iterable:
-            if self.phase != 0 and (i, j) not in self.moves:
+        for coors in iterable:
+            if self.phase != 0 and coors not in self.moves:
                 continue
-            coors: tuple[int, int] = (i, j)
-            shift: tuple[int, int] = (0, 0) if self.phase == 0 else self.moves[coors].s
+            shift = Coordinate(0, 0) if self.phase == 0 else self.moves[coors].shift
             value = (
-                self.board[coors[0] + shift[0]][coors[1] + shift[1]]
+                self.board[coors.y + shift.y][coors.x + shift.x]
                 if self.phase == 0
-                else self.moves[coors].v
+                else self.moves[coors].value
             )
-            row_idx = int(2 * (coors[0] + (((self.phase + 5) % 6) / 6 * shift[0])))
-            col_idx = int(
-                5 * (coors[1] + (((1 + ((self.phase + 4) % 5)) / 5) * shift[1]))
-            )
+            real_phase = (self.phase + 4) % 5
+            row_idx = int(2 * (coors.y + (real_phase / 5 * shift.y)))
+            col_idx = int(5 * (coors.x + (((1 + real_phase) / 5) * shift.x)))
 
             box = (
                 DATA["TL"][board_str[row_idx][col_idx]]
@@ -83,12 +81,12 @@ class Board(Drawable):
                 board_str[row_idx + k] = "".join(row_list)
 
         for row in board_str:
-            print(row + self.move(-self.dim[0], 1), end="", flush=True)
+            print(row + self.move(-self.dim.x, 1), end="", flush=True)
 
         print(
             self.move(0, 1)
             + "Score:"
-            + (" " * (self.dim[0] - 6 - len(str(self.score))))
+            + (" " * (self.dim.x - 6 - len(str(self.score))))
             + str(self.score),
             end="",
             flush=True,

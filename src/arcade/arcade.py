@@ -1,7 +1,7 @@
 from arcade.arcade_drawable import Border, Transition, Menu
 from abalone.abalone import Abalone
 from tzfe.tzfe import TZFE
-from structs import Status, GameInfo
+from structs import Status, GameInfo, Coordinate
 
 import os
 import json
@@ -25,13 +25,15 @@ class Arcade:
     # game classes
     GAMES: list[Any] = field(default_factory=lambda: [Abalone, TZFE])
 
-    border: Border = field(default_factory=lambda: Border(dim=(36, 21)))
-    transition: Transition = field(default_factory=lambda: Transition(dim=(36, 21)))
-    menu: Menu = field(default_factory=lambda: Menu(dim=(36, 21)))
-
     def __post_init__(self):
         self.listener = Listener(on_press=self.on_press)  # key input listener
         self.data: dict[str, Any] = self.load_data("menu")  # menu.json content
+
+        # display elements
+        dim = Coordinate(36, 21)
+        self.border = Border(dim=dim)
+        self.transition = Transition(dim=dim)
+        self.menu = Menu(dim=dim)
 
     # loads data from the a json file
     def load_data(self, dir: str) -> dict[str, Any]:

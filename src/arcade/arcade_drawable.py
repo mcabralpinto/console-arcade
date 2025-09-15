@@ -12,7 +12,7 @@ import os
 class Border(Drawable):
     # draws the arcade border
     def content(self, _) -> None:
-        W, H = self.dim[0], self.dim[1]
+        W, H = self.dim.x, self.dim.y
         x_pad = (os.get_terminal_size().columns - W) // 2
         c = " " * (x_pad - 1)
 
@@ -34,7 +34,7 @@ class Border(Drawable):
 class Transition(Drawable):
     # draws half a transition effect
     def half(self, char: str) -> None:
-        W, H = self.dim[0], self.dim[1]
+        W, H = self.dim.x, self.dim.y
         oob = False
         offset = W // W
         rest = 1 if W // offset == 0 else 0
@@ -85,11 +85,6 @@ class Menu(Drawable):
     def update(self, values: list[Any]) -> None:
         self.title, self.option, self.game, self.curr, self.status = values
 
-    # returns the length of a string without ANSI escape sequences
-    def pure_len(self, text: str) -> int:
-        ansi_escape = re.compile(r"\x1B[@-_][0-?]*[ -/]*[@-~]")
-        return len(ansi_escape.sub("", text))
-
     # returns the string representation of the current game in the replay menu
     def replay_str(self, info: Any) -> str:
         date = datetime.now().strftime("%d-%m-%Y")
@@ -107,7 +102,7 @@ class Menu(Drawable):
 
     # returns the title of the current menu
     def menu_title(self) -> str:
-        W = self.dim[0]
+        W = self.dim.x
         R, N = "\033[C", self.move(-W, 1)
         ML = max(len(s) for s in self.data["MENUS"][self.title])
 
@@ -124,7 +119,7 @@ class Menu(Drawable):
 
     # returns the score string for the previous game
     def menu_post_game(self) -> str:
-        W = self.dim[0]
+        W = self.dim.x
         D, R, N = "\033[B", "\033[C", self.move(-W, 1)
 
         if self.status != Status.POST_GAME or self.title == "REPLAYS":
@@ -140,14 +135,14 @@ class Menu(Drawable):
 
     # returns the option string for the current menu
     def menu_list(self) -> str:
-        W, B = self.dim[0], 14 if self.title != "REPLAYS" else 26
+        W, B = self.dim.x, 14 if self.title != "REPLAYS" else 26
         D, N = "\033[B", self.move(-W, 1)
         space = 6 if self.status != Status.POST_GAME or self.title == "REPLAYS" else 8
-        opt_n = (2 * ((l := self.dim[1] - space) // 4)) + 1
+        opt_n = (2 * ((l := self.dim.y - space) // 4)) + 1
         idxs = [2 * i + (1 if l % 4 > 1 else 0) for i in range(opt_n)]
 
         game = self.data["OPTS"]["MAIN"][self.game - 1].upper()
-        opts = (
+        opts = self.data["OPTS"][
             (
                 (("RE_" if self.status == Status.POST_GAME else "") + "GAME")
                 if self.title != "REPLAYS"
@@ -155,22 +150,21 @@ class Menu(Drawable):
             )
             if self.title != "MAIN"
             else "MAIN"
-        )
+        ]
 
         final = ""
         for i in range(l):
             if i in idxs:
-                cond = (curr := self.option + (i - opt_n + 1) // 2) < 0 or curr >= len(
-                    self.data["OPTS"][opts]
-                )
+                curr = self.option + (i - opt_n + 1) // 2
+                condition = curr < 0 or curr >= len(opts)
                 final += (
                     " " * ((W - B) // 2)
                     + ("> " if curr == self.option else "")
-                    + ("" if cond else self.data["OPTS"][opts][curr])
+                    + ("" if condition else opts[curr])
                     + " "
                     * (
                         (W + ((B - 3) if curr == self.option else (B + 1))) // 2
-                        - (0 if cond else self.pure_len(self.data["OPTS"][opts][curr]))
+                        - (0 if condition else len(self.strip_ansi(opts[curr])))
                     )
                     + N
                 )
@@ -182,7 +176,7 @@ class Menu(Drawable):
     # draws the current menu state
     def content(self, values: list[Any]) -> None:
         self.update(values)
-        W, H = self.dim[0], self.dim[1]
+        W = self.dim.x
         R, N = "\033[C", self.move(-W, 1)
 
         print(

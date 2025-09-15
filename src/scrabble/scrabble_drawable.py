@@ -54,7 +54,7 @@ class Board(Drawable):
         self.update(values)
         S: dict[bool, int] = self.scores
         T: dict[bool, list[TileScrabble]] = self.tiles
-        SIZE: int = (self.dim[0] - 1) // 4
+        SIZE: int = (self.dim.x - 1) // 4
         turn = self.turn % 2 == 1
 
         # board
@@ -73,7 +73,7 @@ class Board(Drawable):
         # hands / scores
         side_space = 2
         middle_len = 23
-        side_len = (self.dim[0] - 2 * side_space - middle_len) // 2
+        side_len = (self.dim.x - 2 * side_space - middle_len) // 2
         side = f"{' ' * side_space}"
         top = f"┌{'─' * 15}┐"
         left_top = self.paint(top, "GREEN" if self.turn % 2 == 1 else "")
@@ -81,7 +81,7 @@ class Board(Drawable):
         bottom = f"└{'─' * 15}┘"
         left_bottom = self.paint(bottom, "GREEN" if self.turn % 2 == 1 else "")
         right_bottom = self.paint(bottom, "GREEN" if self.turn % 2 == 0 else "")
-        middle = " " * (self.dim[0] - 2 * side_space - 34)
+        middle = " " * (self.dim.x - 2 * side_space - 34)
 
         left_hand = " ".join(T[1]["HAND"][i].letter for i in range(len(T[1]["HAND"])))
         right_hand = " ".join(T[0]["HAND"][i].letter for i in range(len(T[0]["HAND"])))
@@ -105,7 +105,7 @@ class Board(Drawable):
         display.append(f"{side}{left_top}{middle}{right_top}{side}")
         display.append(f"{side}{left}{score}{right}{side if turn else ''}")
         display.append(f"{side}{left_bottom}{middle}{right_bottom}{side}")
-        display.append(f"{' ' * self.dim[0]}")
+        display.append(f"{' ' * self.dim.x}")
 
         # legends
         action1 = "Play" if len(T[turn]["PLAY"]) > 1 else "Pass"
@@ -133,18 +133,18 @@ class Board(Drawable):
                     "[4] Switch to " + ("↓" if self.direction else "→"),
                 ]
             )
-        padding = (self.dim[0] - len(self.strip_ansi(legend_str))) // 2
+        padding = (self.dim.x - len(self.strip_ansi(legend_str))) // 2
         turn_str = f"Turn {self.turn} ({self.tiles_left} tiles remaining)"
 
         display.append(f"{' ' * padding}{legend_str}{' ' * padding}")
-        display.append(f"{' ' * self.dim[0]}")
-        display.append(turn_str.center(self.dim[0]))
-        # display.append(str(self.new_words).center(self.dim[0]))
-        # display.append(str(self.tiles[0]["PLAY"]).center(self.dim[0]))
-        # display.append(str(self.tiles[1]["PLAY"]).center(self.dim[0]))
+        display.append(f"{' ' * self.dim.x}")
+        display.append(turn_str.center(self.dim.x))
+        # display.append(str(self.new_words).center(self.dim.x))
+        # display.append(str(self.tiles[0]["PLAY"]).center(self.dim.x))
+        # display.append(str(self.tiles[1]["PLAY"]).center(self.dim.x))
 
         for row in display:
-            print(row + self.move(-self.dim[0], 1), end="", flush=True)
+            print(row + self.move(-self.dim.x, 1), end="", flush=True)
 
 
 # line outline

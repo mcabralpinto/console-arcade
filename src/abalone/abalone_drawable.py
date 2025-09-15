@@ -2,11 +2,13 @@ from drawable import Drawable
 from dataclasses import dataclass, field
 from typing import Any
 
+from structs import Coordinate
+
 
 @dataclass
 class Board(Drawable):
     board: list[list[str]] = field(default_factory=list)
-    cursor: list[int] = field(default_factory=list)
+    cursor: Coordinate = field(default_factory=lambda: Coordinate(0, 0))
     scores: dict[str, int] = field(default_factory=dict)
     turn: bool = field(default_factory=bool)
 
@@ -17,14 +19,14 @@ class Board(Drawable):
     def content(self, values: list[Any]) -> None:
         self.update(values)
         b, c, s = self.board, self.cursor, self.scores
-        W = self.dim[0]
+        W = self.dim.x
         R, B = self.paint("■", "RED"), self.paint("■", "BLUE")
         RC, BC = self.paint("▣", "RED"), self.paint("▣", "BLUE")
         RE, BE = self.paint("□", "RED"), self.paint("□", "BLUE")
         RA, BA = self.paint("◀", "RED"), self.paint("▶", "BLUE")
 
-        if b[c[0]][c[1]] in ["·", R, B]:
-            b[c[0]][c[1]] = {"·": "◘", R: RC, B: BC}[b[c[0]][c[1]]]
+        if b[c.y][c.x] in ["·", R, B]:
+            b[c.y][c.x] = {"·": "◘", R: RC, B: BC}[b[c.y][c.x]]
 
         board_str = ""
         for i in range(9):

@@ -12,7 +12,7 @@ from copy import copy, deepcopy
 @dataclass
 class Scrabble(Game):
     def __post_init__(self):
-        self.display = {"BOARD": Board(dim=(61, 31))}
+        self.display = {"BOARD": Board(dim=Coordinate(61, 31))}
         self.KEYS = {"MOVE": [Key.up, Key.down, Key.left, Key.right]}  # key mapping
         self.standalone = self.arcade is None
         self.running = True

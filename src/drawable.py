@@ -5,10 +5,12 @@ import json
 import os
 import re
 
+from structs import Coordinate
+
 
 @dataclass
 class Drawable(ABC):
-    dim: tuple[int, int]
+    dim: Coordinate
 
     # loads data from the a json file
     def load_data(self, dir: str) -> dict[str, Any]:
@@ -22,8 +24,8 @@ class Drawable(ABC):
         return f"{(R if x > 0 else L) * abs(x)}{(D if y > 0 else U) * abs(y)}"
 
     def start_pos(self) -> None:
-        x_pad = (os.get_terminal_size().columns - self.dim[0]) // 2
-        y_pad = (os.get_terminal_size().lines - self.dim[1] - 5) // 2
+        x_pad = (os.get_terminal_size().columns - self.dim.x) // 2
+        y_pad = (os.get_terminal_size().lines - self.dim.y - 5) // 2
 
         print("\033[H" + "\033[B" * y_pad + "\033[C" * x_pad, end="", flush=True)
 
@@ -36,7 +38,7 @@ class Drawable(ABC):
 
     # return a string without ANSI escape sequences
     def strip_ansi(self, s: str) -> str:
-        return re.sub(r'\x1b\[[0-9;]*m', '', s)
+        return re.sub(r'\x1B[@-_][0-?]*[ -/]*[@-~]', '', s)
 
     # draws the content of the drawable
     @abstractmethod

@@ -30,9 +30,8 @@
         "MAIN": [
             "Abalone",
             "2048",
-            "Scrabble (WIP)",
-            "Snake (WIP)",
-            "Tetris (WIP)",
+            "Scrabble (Launch-Only)",
+            "Carcassonne (WIP)",
             "Exit"
         ],
         "GAME": [

@@ -48,7 +48,7 @@ class GameInfo:
 
 
 @dataclass
-class Coordinate:  # haven't ported Abalone / 2048 to use this
+class Coordinate:
     x: int
     y: int
 
@@ -61,6 +61,9 @@ class Coordinate:  # haven't ported Abalone / 2048 to use this
 
     def __repr__(self):
         return self.__str__()
+    
+    def __hash__(self):
+        return hash((self.x, self.y))
 
     def __eq__(self, other) -> bool:
         if isinstance(other, Coordinate):
@@ -94,8 +97,8 @@ class Coordinate:  # haven't ported Abalone / 2048 to use this
 
 @dataclass
 class Move2048:
-    v: str  # value
-    s: tuple[int, int]  # shift
+    value: str  # value
+    shift: Coordinate  # shift
 
 
 @dataclass

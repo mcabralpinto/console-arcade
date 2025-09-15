@@ -1,6 +1,6 @@
 from game import Game
 from tzfe.tzfe_drawable import Board
-from structs import Move2048 as Move, Status
+from structs import Move2048 as Move, Status, Coordinate
 
 import time
 from dataclasses import dataclass, field
@@ -12,11 +12,12 @@ from random import random, randint
 
 @dataclass
 class TZFE(Game):
-    moves: dict[tuple[int, int], Move] = field(default_factory=dict)  # moving cell info
+    moves: dict[Coordinate, Move] = field(default_factory=dict)  # moving cell info
     SIZE: int = 4  # board size
 
     def __post_init__(self):
-        self.display = {"BOARD": Board(dim=(self.SIZE * 5 + 1, self.SIZE * 2 + 3))}
+        dim = Coordinate(self.SIZE * 5 + 1, self.SIZE * 2 + 3)
+        self.display = {"BOARD": Board(dim=dim)}
         self.KEYS = {"MOVE": [Key.up, Key.down, Key.left, Key.right]}  # key mapping
         self.standalone = self.arcade is None
         self.running = True
@@ -41,8 +42,6 @@ class TZFE(Game):
         self, n: int, cells: list[tuple[int, int, str]] = []
     ) -> tuple[list[tuple[int, int, str]], bool]:
         self.free_cells -= n
-        i: int
-        j: int
         cells_re: list[tuple[int, int, str]] = []
         for _ in range(n):
             if cells != []:
@@ -58,15 +57,20 @@ class TZFE(Game):
         return cells_re, True
 
     def make_moves(
-        self, b: list[list[str]], key: KeyCode, can_merge_test: bool = False
+        self,
+        b: list[list[str]],
+        key: KeyCode,
+        can_merge_test: bool = False,
     ) -> list[list[str]]:
-        shift: tuple[int, int] = ((-1, 0), (1, 0), (0, -1), (0, 1))[
-            self.KEYS["MOVE"].index(key)
-        ]
+        shift_vector = ((0, -1), (0, 1), (-1, 0), (1, 0))[self.KEYS["MOVE"].index(key)]
+        shift = Coordinate(*shift_vector)
         mergeable: list[list[bool]] = [[True] * self.SIZE for _ in range(self.SIZE)]
         for i in range(self.SIZE):
             for j in range(self.SIZE):
-                self.moves[(i, j)] = Move(v=b[i][j], s=(0, 0))
+                self.moves[Coordinate(j, i)] = Move(
+                    value=b[i][j],
+                    shift=Coordinate(0, 0),
+                )
         for i in range(
             self.SIZE - 2 if key == Key.down else (1 if key == Key.up else 0),
             -1 if key == Key.down else self.SIZE,
@@ -78,25 +82,23 @@ class TZFE(Game):
                 -1 if key == Key.right else 1,
             ):
                 if b[i][j] != "":
-                    coors: list[int] = [i, j]
+                    coors = Coordinate(j, i)
                     value: str = b[i][j]
                     b[i][j] = ""
                     while (
-                        coors[0] + shift[0] < self.SIZE
-                        and coors[0] + shift[0] >= 0
-                        and coors[1] + shift[1] < self.SIZE
-                        and coors[1] + shift[1] >= 0
+                        coors.y + shift.y < self.SIZE
+                        and coors.y + shift.y >= 0
+                        and coors.x + shift.x < self.SIZE
+                        and coors.x + shift.x >= 0
                     ):
-                        if b[coors[0] + shift[0]][coors[1] + shift[1]] == "":
-                            coors[0] += shift[0]
-                            coors[1] += shift[1]
+                        if b[coors.y + shift.y][coors.x + shift.x] == "":
+                            coors += shift
                         elif (
-                            b[coors[0] + shift[0]][coors[1] + shift[1]] == value
-                            and mergeable[coors[0] + shift[0]][coors[1] + shift[1]]
+                            b[coors.y + shift.y][coors.x + shift.x] == value
+                            and mergeable[coors.y + shift.y][coors.x + shift.x]
                         ):
-                            coors[0] += shift[0]
-                            coors[1] += shift[1]
-                            mergeable[coors[0]][coors[1]] = False
+                            coors += shift
+                            mergeable[coors.y][coors.x] = False
                             self.score += 2 * int(value)
                             value = str(2 * int(value))
                             if not can_merge_test:
@@ -104,12 +106,17 @@ class TZFE(Game):
                             break
                         else:
                             break
-                    b[coors[0]][coors[1]] = value
-                    self.moves[(i, j)].s = (coors[0] - i, coors[1] - j)
-        self.moves = dict[tuple[int, int], Move](
+                    b[coors.y][coors.x] = value
+                    self.moves[Coordinate(j, i)].shift = Coordinate(
+                        coors.x - j,
+                        coors.y - i,
+                    )
+        self.moves = dict[Coordinate, Move](
             sorted(
-                {a: b for a, b in self.moves.items() if b.v != ""}.items(),
-                key=lambda item: max(abs(int(item[1].s[0])), abs(int(item[1].s[1]))),
+                {a: b for a, b in self.moves.items() if b.value != ""}.items(),
+                key=lambda item: max(
+                    abs(int(item[1].shift.y)), abs(int(item[1].shift.x))
+                ),
             )
         )
         return b
@@ -119,18 +126,18 @@ class TZFE(Game):
         c: Optional[tuple[int, int, str]] = info[0] if info != [] else None
         try:
             if key in self.KEYS["MOVE"]:
-                aux_board: list[list[str]] = self.make_moves(deepcopy(self.board), key)
+                aux_board = self.make_moves(deepcopy(self.board), key)
                 if aux_board != self.board:
                     self.board = deepcopy(aux_board)
 
-                    for i in range(5 if key in self.KEYS["MOVE"][0:1] else 4):
+                    for i in range(4):
                         if (not self.standalone) and (
                             c != None and self.arcade.status != Status.IN_REPLAY
                         ):
                             break
                         self.render(i + 1)
                         time.sleep(0.015)
-                    r: bool = (
+                    r = (
                         self.arcade.status == Status.IN_REPLAY
                         if not self.standalone
                         else False
@@ -139,8 +146,7 @@ class TZFE(Game):
                     if not self.standalone and c == None:
                         self.arcade.game_info.keys.append(key)
                         self.arcade.game_info.data["CELLS"] += cells
-                    if c == None or r:
-                        self.render(0)
+                    self.render(0)
                     if not proceed:
                         time.sleep(1)
                         if not self.standalone:
@@ -204,7 +210,7 @@ class TZFE(Game):
                 with keyboard.Listener(on_press=on_key_press) as listener:
                     listener.join()
 
-                os.system("cls" if os.name == "nt" else "clear")
+                # os.system("cls" if os.name == "nt" else "clear")
 
         except KeyboardInterrupt:
             pass

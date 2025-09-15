@@ -1,7 +1,8 @@
 env
 src/unfinished
+TODO.md
 
-# Python temp files
+# python temp files
 __pycache__/
 *.py[cod]
 *$py.class
