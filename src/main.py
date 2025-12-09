@@ -6,6 +6,7 @@ from arcade.arcade import Arcade
 from abalone.abalone import Abalone
 from tzfe.tzfe import TZFE
 from scrabble.scrabble import Scrabble
+from carcassonne.carcassonne import Carcassonne
 
 if os.name == "nt":
     import msvcrt
@@ -77,6 +78,9 @@ def main():
                 case "scrabble":
                     game = Scrabble(None)
                     game.run()
+                case "carcassonne":
+                    game = Carcassonne(None)
+                    game.run()
                 case _:
                     arcade = Arcade()
                     arcade.run()
@@ -88,7 +92,7 @@ def main():
         pass
     finally:
         show_cursor()
-        clear_console()
+        #clear_console()
 
 
 if __name__ == "__main__":

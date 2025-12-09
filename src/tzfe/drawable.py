@@ -1,5 +1,5 @@
 from drawable import Drawable
-from utils import Coordinate
+from utils import Coordinate, load_data
 from tzfe.utils import Move
 
 from dataclasses import dataclass, field
@@ -20,7 +20,7 @@ class Board(Drawable):
     def content(self, values: list[Any]) -> None:
         self.update(values)
         SIZE: int = (self.dim.x - 1) // 5
-        DATA: dict[str, dict[str, str]] = self.load_data("games\\2048")
+        DATA: dict[str, dict[str, str]] = load_data("games\\2048")
 
         board_str: list[str] = []
         board_str.append(f"┌{'────┬' * (SIZE - 1)}────┐")

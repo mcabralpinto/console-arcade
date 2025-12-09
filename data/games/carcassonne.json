@@ -1,0 +1,268 @@
+{
+    "TILES": [
+        {
+            "STRUCTURES": [
+                "CFFFFF",
+                "CCFFFF",
+                "CCCFFF",
+                "CCCFFF",
+                "CCCCFF",
+                "CCCCCF"
+            ],
+            "AMOUNT": 3
+        },
+        {
+            "STRUCTURES": [
+                "CFFFFF",
+                "CCFFFF",
+                "CCCFFF",
+                "CCCFFF",
+                "SCCCFF",
+                "SSCCCF"
+            ],
+            "AMOUNT": 2
+        },
+        {
+            "STRUCTURES": [
+                "CFRFFF",
+                "CFRFFF",
+                "CFFRRR",
+                "CFRFFF",
+                "CFRFFF",
+                "FFRFFF"
+            ],
+            "AMOUNT": 3
+        },
+        {
+            "STRUCTURES": [
+                "CFFFFF",
+                "CFFFFC",
+                "CFFFFC",
+                "CFFFFC",
+                "CFFFFC",
+                "FFFFFC"
+            ],
+            "AMOUNT": 3
+        },
+        {
+            "STRUCTURES": [
+                "FFFFFF",
+                "FFFFFF",
+                "FFAAFF",
+                "FFAAFF",
+                "FFFFFF",
+                "FFFFFF"
+            ],
+            "AMOUNT": 4
+        },
+        {
+            "STRUCTURES": [
+                "FFFFFF",
+                "FFFFFF",
+                "FFAARR",
+                "FFAAFF",
+                "FFFFFF",
+                "FFFFFF"
+            ],
+            "AMOUNT": 2
+        },
+        {
+            "STRUCTURES": [
+                "FFRFFF",
+                "FFRFFF",
+                "RRFRRR",
+                "FFRFFF",
+                "FFRFFF",
+                "FFRFFF"
+            ],
+            "AMOUNT": 1
+        },
+        {
+            "STRUCTURES": [
+                "FFRFFF",
+                "FFRFFF",
+                "FFRRRR",
+                "FFFFFF",
+                "FFFFFF",
+                "FFFFFF"
+            ],
+            "AMOUNT": 9
+        },
+        {
+            "STRUCTURES": [
+                "FFRFFF",
+                "FFRFFF",
+                "FFRFFF",
+                "FFRFFF",
+                "FFRFFF",
+                "FFRFFF"
+            ],
+            "AMOUNT": 8
+        },
+        {
+            "STRUCTURES": [
+                "FFRFFF",
+                "FFRFFF",
+                "FFFRRR",
+                "FFRFFF",
+                "FFRFFF",
+                "FFRFFF"
+            ],
+            "AMOUNT": 4
+        },
+        {
+            "STRUCTURES": [
+                "SSCCCC",
+                "SCCCCC",
+                "CCCCCC",
+                "CCCCCC",
+                "CCCCCC",
+                "CCCCCC"
+            ],
+            "AMOUNT": 1
+        },
+        {
+            "STRUCTURES": [
+                "CCCCCC",
+                "CCCCCF",
+                "CCCCFF",
+                "CCCCFF",
+                "CCCCFF",
+                "CCCCCF"
+            ],
+            "AMOUNT": 3
+        },
+        {
+            "STRUCTURES": [
+                "SSCCCC",
+                "SCCCCF",
+                "CCCCFF",
+                "CCCCFF",
+                "CCCCFF",
+                "CCCCCF"
+            ],
+            "AMOUNT": 1
+        },
+        {
+            "STRUCTURES": [
+                "CCCCCC",
+                "CCCCCF",
+                "CCCCRR",
+                "CCCCFF",
+                "CCCCFF",
+                "CCCCCF"
+            ],
+            "AMOUNT": 1
+        },
+        {
+            "STRUCTURES": [
+                "SSCCCC",
+                "SCCCCF",
+                "CCCCRR",
+                "CCCCFF",
+                "CCCCFF",
+                "CCCCCF"
+            ],
+            "AMOUNT": 2
+        },
+        {
+            "STRUCTURES": [
+                "FCCCCC",
+                "CFFFFF",
+                "CFFFFF",
+                "CFFFFF",
+                "CFFFFF",
+                "FFFFFF"
+            ],
+            "AMOUNT": 2
+        },
+        {
+            "STRUCTURES": [
+                "CFFFFF",
+                "CFFFFF",
+                "CFFFFF",
+                "CFFFFF",
+                "CFFFFF",
+                "FFFFFF"
+            ],
+            "AMOUNT": 5
+        },
+        {
+            "STRUCTURES": [
+                "CFRFFF",
+                "CFRFFF",
+                "CFRFFF",
+                "CFRFFF",
+                "CFRFFF",
+                "FFRFFF"
+            ],
+            "AMOUNT": 4
+        },
+        {
+            "STRUCTURES": [
+                "CFRFFF",
+                "CFRFFF",
+                "CFRRRR",
+                "CFFFFF",
+                "CFFFFF",
+                "FFFFFF"
+            ],
+            "AMOUNT": 3
+        },
+        {
+            "STRUCTURES": [
+                "CFFFFF",
+                "CFFFFF",
+                "CFRRRR",
+                "CFRFFF",
+                "CFRFFF",
+                "FFRFFF"
+            ],
+            "AMOUNT": 3
+        },
+        {
+            "STRUCTURES": [
+                "FCCCCC",
+                "FFCCCF",
+                "FFCCFF",
+                "FFCCFF",
+                "FCCCFF",
+                "CCCCCF"
+            ],
+            "AMOUNT": 1
+        },
+        {
+            "STRUCTURES": [
+                "FCCCCC",
+                "FFCCCF",
+                "FFCCFF",
+                "FFCCFF",
+                "FSCCFF",
+                "SSCCCF"
+            ],
+            "AMOUNT": 2
+        },
+        {
+            "STRUCTURES": [
+                "CFRFFF",
+                "CFRFFF",
+                "CFRRRR",
+                "CFFFFF",
+                "CFFFFF",
+                "CCCCCF"
+            ],
+            "AMOUNT": 3
+        },
+        {
+            "STRUCTURES": [
+                "CFRFFF",
+                "CFRFFF",
+                "CFRRRR",
+                "CFFFFF",
+                "SFFFFF",
+                "SSCCCF"
+            ],
+            "AMOUNT": 2
+        }
+    ]
+}

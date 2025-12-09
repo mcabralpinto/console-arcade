@@ -1,5 +1,5 @@
 from drawable import Drawable
-from utils import Status
+from utils import Status, load_data
 from dataclasses import dataclass, field
 from typing import Any
 from datetime import datetime
@@ -80,7 +80,7 @@ class Menu(Drawable):
     status: Status = Status.PRE_GAME
 
     def __post_init__(self):
-        self.data = self.load_data("menu")
+        self.data = load_data("menu")
 
     def update(self, values: list[Any]) -> None:
         self.title, self.option, self.game, self.curr, self.status = values

@@ -354,3 +354,5 @@ class Abalone(Game):
 
         except KeyboardInterrupt:
             pass
+
+# fix movement

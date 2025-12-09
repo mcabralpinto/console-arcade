@@ -215,3 +215,5 @@ class TZFE(Game):
 
         except KeyboardInterrupt:
             pass
+
+# fix visual frame bug :(

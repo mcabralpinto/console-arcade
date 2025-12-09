@@ -1,10 +1,9 @@
 from drawable import Drawable
-from utils import Coordinate
+from utils import Coordinate, load_data
 from scrabble.utils import Tile
 
 from dataclasses import dataclass, field
 from typing import Any
-import random
 
 
 @dataclass
@@ -37,7 +36,7 @@ class Board(Drawable):
     def get_display_char(self, row: int, col: int) -> str:
         # get the character to display at a position
         tile: Tile = self.board[row][col]
-        DATA = self.load_data("games\\scrabble")
+        DATA = load_data("games\\scrabble")
 
         if self.cursor == (col, row):
             return DATA["CURSOR"][0 if self.direction else 1]

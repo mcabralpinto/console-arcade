@@ -1,7 +1,7 @@
 from arcade.drawable import Border, Transition, Menu
 from abalone.abalone import Abalone
 from tzfe.tzfe import TZFE
-from utils import Status, GameInfo, Coordinate
+from utils import Status, GameInfo, Coordinate, load_data
 
 import os
 import json
@@ -27,7 +27,7 @@ class Arcade:
 
     def __post_init__(self):
         self.listener = Listener(on_press=self.on_press)  # key input listener
-        self.data: dict[str, Any] = self.load_data("menu")  # menu.json content
+        self.data: dict[str, Any] = load_data("menu")  # menu.json content
 
         # display elements
         dim = Coordinate(36, 21)
@@ -117,8 +117,8 @@ class Arcade:
                             self.game_info.clear()
 
                         elif opt_text == "Replays":
-                            self.data = self.load_data("menu")
-                            replays = self.load_data(f"replays\\{game.lower()}")
+                            self.data = load_data("menu")
+                            replays = load_data(f"replays\\{game.lower()}")
                             if len(replays) > 0:
                                 self.transition.draw()
                                 self.title = "REPLAYS"
@@ -138,7 +138,7 @@ class Arcade:
                         elif self.title == "REPLAYS":
                             self.transition.draw()
                             self.status = Status.IN_REPLAY
-                            stored_info = self.load_data(f"replays\\{game.lower()}")[
+                            stored_info = load_data(f"replays\\{game.lower()}")[
                                 self.opt
                             ]
                             self.game_info.str_to_data(stored_info)

@@ -1,7 +1,7 @@
 import random
 from game import Game
 from scrabble.drawable import Board
-from utils import Status, Coordinate
+from utils import Status, Coordinate, load_data
 from scrabble.utils import Tile
 
 from dataclasses import dataclass
@@ -19,8 +19,8 @@ class Scrabble(Game):
         self.running = True
 
     def start(self) -> None:
-        self.data: dict[Any] = self.load_data("games\\scrabble")
-        self.dictionary: dict[str, list[str]] = self.load_data("games\\scrabble_words")
+        self.data: dict[Any] = load_data("games\\scrabble")
+        self.dictionary: dict[str, list[str]] = load_data("games\\scrabble_words")
         random.shuffle(self.data["LETTERS"])
 
         # game board
@@ -150,7 +150,7 @@ class Scrabble(Game):
         while not new.adjacent(placed[0].position):
             new += move
             if (
-                not new.in_bounds(Coordinate(15, 15))
+                not new.in_bounds(Coordinate(14, 14))
                 or self.board[new.y][new.x] is None
             ):
                 return False
@@ -234,10 +234,10 @@ class Scrabble(Game):
         reverse_move = (-move[0], -move[1])
 
         # determine word starting position
-        while current_position.in_bounds(Coordinate(15, 15)):
+        while current_position.in_bounds(Coordinate(14, 14)):
             test_pos = current_position + reverse_move
             if (
-                test_pos.in_bounds(Coordinate(15, 15))
+                test_pos.in_bounds(Coordinate(14, 14))
                 and self.board[test_pos.y][test_pos.x] is not None
             ):
                 current_position = test_pos
@@ -251,7 +251,7 @@ class Scrabble(Game):
         word = ""
 
         # determine word score
-        while current_position.in_bounds(Coordinate(15, 15)) and (
+        while current_position.in_bounds(Coordinate(14, 14)) and (
             tile := self.board[current_position.y][current_position.x]
         ):
             # score overlapping words
@@ -455,4 +455,5 @@ class Scrabble(Game):
 
 
 # tiles toggle
-# challenging mechanic
+# fix bug (trying to write on an L of tiles)
+# fix visual score bug
